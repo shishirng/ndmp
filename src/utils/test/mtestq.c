@@ -4,12 +4,21 @@
 #include <queue.h>
 #include <locks.h>
 
-void set_up_job_queue(struct queue_hdr* queue, int num_jobs);
-int check_job_queue(struct queue_hdr* queue, int num_jobs, int num_threads);
-void *get_jobs(void *queue) ;
 
 static struct lock *num_lock;
 int queue_size;
+
+struct thread_args {
+	struct queue_hdr *queue;
+	int num_jobs;
+};
+
+void set_up_job_queue(struct queue_hdr* queue, int num_jobs);
+int check_job_queue(struct queue_hdr* queue, int num_jobs, int num_threads);
+void *get_jobs(void *queue) ;
+int queue_cmp(void *target, void *elem);
+void *get_and_remove_jobs(void *args);
+
 
 int main() 
 {
@@ -18,6 +27,10 @@ int main()
 	struct queue_hdr *job_queue = init_queue();
 	set_up_job_queue(job_queue,100);
 	check_job_queue(job_queue,100,10);
+	printf ("Multi-threaded enqueue-dequeue test passed\n");
+	set_up_job_queue(job_queue,100);
+	check_job_removal(job_queue,100,10);
+	printf ("Multi-threaded check_job_removal test passed\n");
 }
 
 void add_a_job(struct queue_hdr *job_queue, int i)
@@ -32,14 +45,16 @@ int *get_job_from_queue(struct queue_hdr *job_queue) {
 	return dequeue(job_queue);
 }
 
-void set_up_job_queue(struct queue_hdr* queue, int n) {
+void set_up_job_queue(struct queue_hdr* queue, int n) 
+{
 
 	int i;
 	for (i=0; i<n; i++)
 		add_a_job(queue, i);
 }
 
-int check_job_queue(struct queue_hdr *queue, int num_jobs, int num_threads) {
+int check_job_queue(struct queue_hdr *queue, int num_jobs, int num_threads) 
+{
 
 	int i;
 	queue_size = 0;
@@ -57,13 +72,37 @@ int check_job_queue(struct queue_hdr *queue, int num_jobs, int num_threads) {
 
 	assert(queue_size == num_jobs);
 
-	printf ("Multi-threaded queue test passed\n");
+
+	
+}
+
+int check_job_removal(struct queue_hdr *queue, int num_jobs, int num_threads) 
+{
+
+	int i;
+
+	struct thread_args args;
+	args.queue = queue;
+	args.num_jobs = num_jobs;
+	pthread_t *threads = (pthread_t *)malloc(num_threads*sizeof(pthread_t));
+
+	assert(num_elems(queue) == num_jobs);
+	for(i=0; i<num_threads; i++) {
+	   pthread_create(&threads[i], NULL, get_and_remove_jobs, (void *)&args);
+	}
+
+	for(i=0; i<num_threads; i++) {
+	   pthread_join(threads[i], NULL);
+	}
+	assert(num_elems(queue) == 0);
+
 
 	
 }
 
 
-void *get_jobs(void *queue) {
+void *get_jobs(void *queue) 
+{
 	struct queue_hdr *job_queue = (struct queue_hdr *) queue;
 	while (dequeue(job_queue) != NULL) {
 		enter_critical_section(num_lock);
@@ -72,3 +111,24 @@ void *get_jobs(void *queue) {
 	}
 	pthread_exit(NULL);
 }
+
+void *get_and_remove_jobs(void *args)
+{
+	struct queue_hdr *job_queue = ((struct thread_args *) args)->queue;
+	int i,n;
+	
+	n = ((struct thread_args *) args)->num_jobs;
+
+	for (i=0; i<n; i++) {
+		if (get(job_queue,&i,queue_cmp) != NULL) {
+			remove_elem(job_queue,&i,queue_cmp);
+			assert(get(job_queue,&i,queue_cmp) == NULL);
+		}
+	}
+
+}
+
+int queue_cmp(void *target, void *elem)
+{
+	return (*((int *)target) == *((int *)elem));
+}  

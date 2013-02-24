@@ -18,9 +18,15 @@ struct queue_hdr {
 	int num_elems;
 };
 
+typedef int (*comparator) (void *target, void *elem); /* returns 1 if target matches
+                                                * elem
+						*/
 struct queue_hdr* init_queue();
 void enqueue(struct queue_hdr* hdr, void *elem);
 void *dequeue(struct queue_hdr *hdr);
+
+void* get(struct queue_hdr *hdr, void* target, comparator cmp);
+void remove_elem(struct queue_hdr *hdr, void* target, comparator cmp);
 
 int num_elems(struct queue_hdr *hdr);
 #endif

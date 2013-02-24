@@ -8,7 +8,6 @@ void exit_critical_section(struct lock *q_lock);
 
 struct queue_hdr* init_queue() 
 {
-
 	if (q_lock == NULL)
 		q_lock = get_lock();
 	return (struct queue_hdr *) calloc (1,sizeof(struct queue_hdr));
@@ -24,7 +23,7 @@ void enqueue(struct queue_hdr* hdr, void *elem)
 
 	enter_critical_section(q_lock); 
 	/*
-	 * Queue can either be emoty or non-empty
+	 * Queue can either be empty or non-empty
          */
 
 	if (hdr->first == NULL) {  // empty queue
@@ -41,7 +40,6 @@ void enqueue(struct queue_hdr* hdr, void *elem)
 
 void *dequeue(struct queue_hdr *hdr) 
 {
-
 	void* retval;
         struct queue_node *node;
 	
@@ -59,6 +57,59 @@ void *dequeue(struct queue_hdr *hdr)
 	exit_critical_section(q_lock);
 
 	return retval;
+}
+
+
+void* get(struct queue_hdr *hdr, void* target, comparator cmp)
+{
+	int result;	
+	struct queue_node *node;
+	enter_critical_section(q_lock); 
+	node = hdr->first;
+	while (node != NULL) {
+		if (result = cmp(target,node->elem)) {
+			exit_critical_section(q_lock);			
+			return node->elem;
+		}
+		else
+			node = node->next;
+	}
+	exit_critical_section(q_lock);		
+	return NULL;
+}
+
+void remove_elem(struct queue_hdr *hdr, void* target, comparator cmp)
+{
+	
+	struct queue_node *node, *nodeprev;
+	
+	enter_critical_section(q_lock); 
+	nodeprev = hdr->first;
+	node = nodeprev;
+				
+	while (node != NULL) {
+		if (cmp(target,node->elem)) { 
+		/* Is target the first element? */
+			if (node == hdr->first) {			
+				hdr->first = node->next;	
+			}
+		/* Is target the last element? */
+			else if (node == hdr->last)  {
+				hdr->last = nodeprev;
+				nodeprev->next = NULL;
+			}
+		/* Else it is in the middle of the list */
+			else {
+				nodeprev->next = node->next;
+			}			
+			hdr->num_elems--;
+			free(node);
+			break;
+		}
+		nodeprev = node;
+		node = node->next;
+	}
+ 	exit_critical_section(q_lock);		
 }
 
 int num_elems(struct queue_hdr *hdr) 
