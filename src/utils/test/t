@@ -1,4 +1,0 @@
-int queue_cmp(void *target, void *elem)
-{
-	return (*((int *)target) == *((int *)elem));
-}  
