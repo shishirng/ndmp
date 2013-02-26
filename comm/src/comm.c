@@ -249,6 +249,8 @@ void handle_a_client_request(int fd, struct comm_context *ctx)
 	txn->client_session = tmp;
 	txn->request.length = recv(fd, txn->request.message, 
 				        MAX_MESSAGE_SIZE, 0);
+	printf("hex dump of received message:\n"); 
+	hexdump(txn->request.message,txn->request.length);
 	if (txn->request.length == 0) {
 		/*
 		 * Event on this socket indicated socket closure
@@ -261,6 +263,7 @@ void handle_a_client_request(int fd, struct comm_context *ctx)
 	}
         enqueue(ctx->client_jobs, txn);	
 	printf("\tcreated a new job on %d [%d bytes]\n", fd, txn->request.length);
+	
 }
 
 int session_comparator(void *target, void *elem) {
