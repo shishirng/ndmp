@@ -9,7 +9,7 @@
 
 #define LISTEN_PORT 10000
 #define NUM_SESSIONS 512
-#define MAX_MESSAGE_SIZE 1024
+#define MAX_MESSAGE_SIZE 2048
 
 #include <queue.h>
 #include <stdlib.h>
@@ -49,7 +49,8 @@ typedef void (*message_handler) (struct client_txn *);
 struct comm_context {
 	message_handler marshal_unmarshal;
 	struct queue_hdr *sessions;
-	struct queue_hdr *client_jobs;
+	struct queue_hdr *request_jobs;
+	struct queue_hdr *response_jobs;
 	int maxfds;
 };
 	

@@ -158,6 +158,7 @@ void comm_listen(struct comm_context *ctx) {
 	for (;;) {
 		printf("Wait on select \n");
 		set_fd_flags(&read_socks,listener,ctx);
+		fflush(stdout);	
 		ready = select((ctx->maxfds)+1, &read_socks, NULL, NULL, NULL);	
 		printf("Woke up from  select \n");
 		if (ready != -1) {
