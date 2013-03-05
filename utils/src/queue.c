@@ -2,15 +2,16 @@
 #include <locks.h>
 #include <stdlib.h>
 
-static struct lock *q_lock = NULL;
 void enter_critical_section(struct lock* q_lock);
 void exit_critical_section(struct lock *q_lock);
 
 struct queue_hdr* init_queue() 
 {
-	if (q_lock == NULL)
-		q_lock = get_lock();
-	return (struct queue_hdr *) calloc (1,sizeof(struct queue_hdr));
+	struct queue_hdr* retval = (struct queue_hdr *) 
+			calloc (1,sizeof(struct queue_hdr));
+	retval->lock = get_lock();
+
+	return retval;
 }
 
 void enqueue(struct queue_hdr* hdr, void *elem) 
@@ -21,7 +22,7 @@ void enqueue(struct queue_hdr* hdr, void *elem)
 	node->elem = elem;
 	node->next = NULL;
 
-	enter_critical_section(q_lock); 
+	enter_critical_section(hdr->lock); 
 	/*
 	 * Queue can either be empty or non-empty
          */
@@ -35,7 +36,7 @@ void enqueue(struct queue_hdr* hdr, void *elem)
 		hdr->last = node;
 	}
 	hdr->num_elems++;
-	exit_critical_section(q_lock);
+	exit_critical_section(hdr->lock);
 }
 
 void *dequeue(struct queue_hdr *hdr) 
@@ -43,9 +44,9 @@ void *dequeue(struct queue_hdr *hdr)
 	void* retval;
         struct queue_node *node;
 	
-        enter_critical_section(q_lock); 
+        enter_critical_section(hdr->lock); 
 	if (hdr->first == NULL) { 
-	    exit_critical_section(q_lock); 
+	    exit_critical_section(hdr->lock); 
 	    return NULL;
 	}
 	node = hdr->first;
@@ -54,7 +55,7 @@ void *dequeue(struct queue_hdr *hdr)
 	retval = node->elem;
 	free(node); // free what we created in enqueue
 	hdr->num_elems--;
-	exit_critical_section(q_lock);
+	exit_critical_section(hdr->lock);
 
 	return retval;
 }
@@ -64,17 +65,17 @@ void* get_elem(struct queue_hdr *hdr, void* target, comparator cmp)
 {
 	int result;	
 	struct queue_node *node;
-	enter_critical_section(q_lock); 
+	enter_critical_section(hdr->lock); 
 	node = hdr->first;
 	while (node != NULL) {
 		if (result = cmp(target,node->elem)) {
-			exit_critical_section(q_lock);			
+			exit_critical_section(hdr->lock);			
 			return node->elem;
 		}
 		else
 			node = node->next;
 	}
-	exit_critical_section(q_lock);		
+	exit_critical_section(hdr->lock);		
 	return NULL;
 }
 
@@ -83,7 +84,7 @@ void remove_elem(struct queue_hdr *hdr, void* target, comparator cmp)
 	
 	struct queue_node *node, *nodeprev;
 	
-	enter_critical_section(q_lock); 
+	enter_critical_section(hdr->lock); 
 	nodeprev = hdr->first;
 	node = nodeprev;
 				
@@ -109,7 +110,7 @@ void remove_elem(struct queue_hdr *hdr, void* target, comparator cmp)
 		nodeprev = node;
 		node = node->next;
 	}
- 	exit_critical_section(q_lock);		
+ 	exit_critical_section(hdr->lock);		
 }
 
 void** get_all_elems(struct queue_hdr *hdr) 
@@ -118,12 +119,12 @@ void** get_all_elems(struct queue_hdr *hdr)
 	int i = 0;
 	struct queue_node *node = hdr->first;
 	void** retval = calloc(n, sizeof(void *));
-	enter_critical_section(q_lock);	
+	enter_critical_section(hdr->lock);	
 	while (node != NULL)  {
 		retval[i++] = node->elem;
 		node = node->next;	
 	}
-	exit_critical_section(q_lock);
+	exit_critical_section(hdr->lock);
 	return retval;
 }
 
@@ -132,9 +133,9 @@ int num_elems(struct queue_hdr *hdr)
 
 	int retval = 0;
 
-	enter_critical_section(q_lock);
+	enter_critical_section(hdr->lock);
 	retval = hdr->num_elems;
-	exit_critical_section(q_lock);
+	exit_critical_section(hdr->lock);
 	
 	return retval;
 }

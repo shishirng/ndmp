@@ -22,9 +22,9 @@ struct comm_context* comm_context() {
 	static struct comm_context *retval = NULL;
 	if (retval == NULL) {
 		retval = calloc(1,sizeof(struct comm_context));
-		init_queue();
-		retval->sessions = malloc(sizeof(struct queue_hdr));
-		retval->client_jobs = malloc(sizeof(struct queue_hdr));
+		retval->sessions = init_queue();
+		retval->request_jobs = init_queue();
+		retval->response_jobs = init_queue();
 	}
 	return retval;
 }
@@ -152,7 +152,7 @@ void comm_listen(struct comm_context *ctx) {
 	ctx->maxfds = listener;
 
 	/* Create Worker Threads */ 
-//	create_worker_threads(THREAD_POOL_SIZE);
+	create_worker_threads(THREAD_POOL_SIZE);
 	/* when the listener wakes up create a session */
 
 	for (;;) {
@@ -259,8 +259,9 @@ void handle_a_client_request(int fd, struct comm_context *ctx)
 		printf("Detected socket closure\n");
 		return;
 	}
-        enqueue(ctx->client_jobs, txn);	
+        enqueue(ctx->request_jobs, txn);	
 	printf("\tcreated a new job on %d [%d bytes]\n", fd, txn->request.length);
+	
 }
 
 int session_comparator(void *target, void *elem) {

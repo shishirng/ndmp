@@ -7,7 +7,7 @@
 
 #include <comm.h>
 
-#define THREAD_POOL_SIZE 5
+#define THREAD_POOL_SIZE 1
 
 void create_thread_pool(int n);
 void shutdown_thread_pool();

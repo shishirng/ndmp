@@ -6,7 +6,7 @@
  * the space allocated for queue element
  *
  */
-
+#include <locks.h>
 struct queue_node {
 	void *elem;
 	struct queue_node *next;
@@ -15,6 +15,7 @@ struct queue_node {
 struct queue_hdr {
 	struct queue_node  *first;
 	struct queue_node  *last;
+	struct lock *lock;
 	int num_elems;
 };
 
