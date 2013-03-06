@@ -1,10 +1,19 @@
+/*
+ * Copyright (c) 2008-2012 Red Hat, Inc. http://www.redhat.com
+ * This file is part of glfs-ndmp.
+ * This file is licensed to you under your choice of the GNU Lesser
+ * General Public License, version 3 or any later version (LGPLv3 or
+ * later), or the GNU General Public License, version 2 (GPLv2), in all
+ * cases as published by the Free Software Foundation.
+ */
+
 #ifndef __H_NDMP__
 #define __H_NDMP__
 
 /*
  * Type definitions based on NDMP V3 spec
  */
- 
+
 enum ndmp_error {
 	NDMP_NO_ERR = 0,
 	NDMP_NOT_SUPPORTED_ERR = 1,
@@ -35,8 +44,7 @@ enum ndmp_error {
 typedef enum ndmp_error ndmp_error;
 
 enum ndmp_header_message_type {
-	NDMP_MESSAGE_REQUEST = 0,
-	NDMP_MESSAGE_REPLY = 1,
+	NDMP_MESSAGE_REQUEST = 0, NDMP_MESSAGE_REPLY = 1,
 };
 typedef enum ndmp_header_message_type ndmp_header_message_type;
 
@@ -123,9 +131,7 @@ struct ndmp_connect_open_reply {
 typedef struct ndmp_connect_open_reply ndmp_connect_open_reply;
 
 enum ndmp_auth_type {
-	NDMP_AUTH_NONE = 0,
-	NDMP_AUTH_TEXT = 1,
-	NDMP_AUTH_MD5 = 2,
+	NDMP_AUTH_NONE = 0, NDMP_AUTH_TEXT = 1, NDMP_AUTH_MD5 = 2,
 };
 typedef enum ndmp_auth_type ndmp_auth_type;
 
@@ -416,8 +422,7 @@ struct ndmp_execute_cdb_reply {
 typedef struct ndmp_execute_cdb_reply ndmp_execute_cdb_reply;
 
 enum ndmp_tape_open_mode {
-	NDMP_TAPE_READ_MODE = 0,
-	NDMP_TAPE_RDWR_MODE = 1,
+	NDMP_TAPE_READ_MODE = 0, NDMP_TAPE_RDWR_MODE = 1,
 };
 typedef enum ndmp_tape_open_mode ndmp_tape_open_mode;
 
@@ -546,8 +551,7 @@ enum ndmp_mover_halt_reason {
 typedef enum ndmp_mover_halt_reason ndmp_mover_halt_reason;
 
 enum ndmp_mover_mode {
-	NDMP_MOVER_MODE_READ = 0,
-	NDMP_MOVER_MODE_WRITE = 1,
+	NDMP_MOVER_MODE_READ = 0, NDMP_MOVER_MODE_WRITE = 1,
 };
 typedef enum ndmp_mover_mode ndmp_mover_mode;
 
@@ -812,9 +816,7 @@ struct ndmp_notify_data_halted_request {
 typedef struct ndmp_notify_data_halted_request ndmp_notify_data_halted_request;
 
 enum ndmp_connect_reason {
-	NDMP_CONNECTED = 0,
-	NDMP_SHUTDOWN = 1,
-	NDMP_REFUSED = 2,
+	NDMP_CONNECTED = 0, NDMP_SHUTDOWN = 1, NDMP_REFUSED = 2,
 };
 typedef enum ndmp_connect_reason ndmp_connect_reason;
 
@@ -865,9 +867,7 @@ struct ndmp_log_file_request {
 typedef struct ndmp_log_file_request ndmp_log_file_request;
 
 enum ndmp_fs_type {
-	NDMP_FS_UNIX = 0,
-	NDMP_FS_NT = 1,
-	NDMP_FS_OTHER = 2,
+	NDMP_FS_UNIX = 0, NDMP_FS_NT = 1, NDMP_FS_OTHER = 2,
 };
 typedef enum ndmp_fs_type ndmp_fs_type;
 

@@ -1,8 +1,16 @@
+/*
+ * Copyright (c) 2008-2012 Red Hat, Inc. http://www.redhat.com
+ * This file is part of glfs-ndmp.
+ * This file is licensed to you under your choice of the GNU Lesser
+ * General Public License, version 3 or any later version (LGPLv3 or
+ * later), or the GNU General Public License, version 2 (GPLv2), in all
+ * cases as published by the Free Software Foundation.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <queue.h>
-
 
 void set_up_job_queue(struct queue_hdr* queue, int num_jobs);
 void check_job_queue(struct queue_hdr* queue, int num_jobs);
@@ -10,10 +18,8 @@ int queue_cmp(void *target, void *elem);
 void check_get_from_queue(struct queue_hdr *queue, int n);
 void check_remove_from_queue(struct queue_hdr *queue, int n);
 
-
 int main() 
 {
-
 	int n = 100;
 	int i;
 	struct queue_hdr *job_queue = init_queue();
@@ -41,7 +47,6 @@ void add_a_job(struct queue_hdr *job_queue, int i)
 
 int *get_job_from_queue(struct queue_hdr *job_queue)
 { 
-
 	return dequeue(job_queue);
 }
 
@@ -52,8 +57,8 @@ void set_up_job_queue(struct queue_hdr* queue, int n)
 		add_a_job(queue, i);
 }
 
-void check_job_queue(struct queue_hdr *queue, int n) {
-
+void check_job_queue(struct queue_hdr *queue, int n)
+{
 	int i, *j;
 	for (i=0; i<n; i++) {
 		j = dequeue(queue);
@@ -84,4 +89,3 @@ void check_remove_from_queue(struct queue_hdr *queue, int n)
 		assert(get_elem(queue,&i,queue_cmp) == NULL);
 	}
 }
-	

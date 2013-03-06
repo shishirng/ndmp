@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2008-2012 Red Hat, Inc. http://www.redhat.com
+ * This file is part of glfs-ndmp.
+ * This file is licensed to you under your choice of the GNU Lesser
+ * General Public License, version 3 or any later version (LGPLv3 or
+ * later), or the GNU General Public License, version 2 (GPLv2), in all
+ * cases as published by the Free Software Foundation.
+ */
+
 #ifndef __H__QUEUE__
 #define __H__QUEUE__
 /*
@@ -7,21 +16,22 @@
  *
  */
 #include <locks.h>
+
 struct queue_node {
 	void *elem;
 	struct queue_node *next;
-}; 
+};
 
 struct queue_hdr {
-	struct queue_node  *first;
-	struct queue_node  *last;
+	struct queue_node *first;
+	struct queue_node *last;
 	struct lock *lock;
 	int num_elems;
 };
 
-typedef int (*comparator) (void *target, void *elem); /* returns 1 if target matches
-                                                * elem
-						*/
+typedef int (*comparator)(void *target, void *elem); /* returns 1 if target matches
+ * elem
+ */
 struct queue_hdr* init_queue();
 void enqueue(struct queue_hdr* hdr, void *elem);
 void *dequeue(struct queue_hdr *hdr);
