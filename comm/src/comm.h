@@ -32,6 +32,7 @@ struct client_endpoint {
 
 struct comm_message {
 	int message_id;
+	int seq_num;
 	char message[MAX_MESSAGE_SIZE];
 	int length;
 	int whence;
@@ -45,7 +46,7 @@ struct session {
 struct client_txn {
 	struct session client_session;
 	struct comm_message request;
-	struct comm_message response;
+	struct comm_message reply;
 };
 
 typedef void (*message_handler) (struct client_txn *);
@@ -53,7 +54,7 @@ struct comm_context {
 	message_handler marshal_unmarshal;
 	struct queue_hdr *sessions;
 	struct queue_hdr *request_jobs;
-	struct queue_hdr *response_jobs;
+	struct queue_hdr *reply_jobs;
 	int maxfds;
 };
 	

@@ -12,6 +12,7 @@
 
 #include <comm.h>
 #include <rpc/xdr.h>
+#include <ndmp_xdr_structs.h>
 
 /*
  * xdr_decode_encode is the entry point

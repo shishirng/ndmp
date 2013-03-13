@@ -22,7 +22,7 @@ void xdr_decode_encode(struct client_txn *txn)
 	 *  1. Decode the message type from txn->request
 	 *  2. Depending on the message type call the appropriate
 	 *     NDMP message handler. When the handler returns,
-	 *     txn->response will hold the marshaled (encoded)NDMP response
+	 *     txn->response will hold the marshaled (encoded) NDMP response
 	 *  3. Enqueue the response into the response queue
 	 */
 
@@ -40,7 +40,7 @@ void xdr_decode_encode(struct client_txn *txn)
 
 	ndmp_dispatch(message_type)(txn, request_stream);
 
-	enqueue(ctx->response_jobs, txn);
+	enqueue(ctx->reply_jobs, txn);
 
 }
 

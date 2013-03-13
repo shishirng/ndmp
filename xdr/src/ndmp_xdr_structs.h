@@ -253,6 +253,18 @@ typedef struct ndmp_config_get_server_info_reply ndmp_config_get_server_info_rep
 #define NDMP_BUTYPE_BACKUP_UTF8 0x0080
 #define NDMP_BUTYPE_RECOVER_UTF8 0x0100
 
+struct ndmp_pval {
+	char *name;
+	char *value;
+};
+typedef struct ndmp_pval ndmp_pval;
+
+struct ndmp_u_quad {
+	u_long high;
+	u_long low;
+};
+typedef struct ndmp_u_quad ndmp_u_quad;
+
 struct ndmp_butype_info {
 	char *butype_name;
 	struct {

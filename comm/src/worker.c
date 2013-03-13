@@ -83,6 +83,7 @@ void *process_response(void *context)
 {
 	int write_result;	
 	struct comm_message response;
+	response->seq_num = 1;
 	struct comm_context *ctx = (struct comm_context *)context;
 	struct client_txn *job;
 	while (1) {
@@ -110,18 +111,18 @@ void *process_response(void *context)
 int write_message(struct client_txn *job)
 {
 	struct session tmp;
-	struct comm_message response;	
+	struct comm_message reply;
 	int fd, sent_bytes;
 	tmp = job->client_session;
-	response = job->response;	
+	reply = job->reply;
 	fd = tmp.session_id;
-	if (response.length > 0) {
+	if (reply.length > 0) {
 
-		sent_bytes = send(fd,response.message,response.length,0);
+		sent_bytes = send(fd,reply.message,reply.length,0);
 		
 		printf("Sent a %d byte response to (%s,%d) on sock %d\n",
 		 sent_bytes, inet_ntoa(tmp.client_info.client.sin_addr),
 		 ntohs(tmp.client_info.client.sin_port), fd);
 	}
-	return -1 * (sent_bytes != response.length);
+	return -1 * (sent_bytes != reply.length);
 }
