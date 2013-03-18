@@ -7,15 +7,15 @@
  * cases as published by the Free Software Foundation.
  */
 
-#ifndef __H_WORKER__
-#define __H_WORKER__
-
 #include <comm.h>
-#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <ndmp_msg.h>
 
-#define THREAD_POOL_SIZE 1
+main()
+{
+	struct comm_context *ctx = comm_context();
+	ctx->marshal_unmarshal = xdr_decode_encode;
+	comm_listen(ctx);
+}
 
-void create_thread_pool(int n);
-void shutdown_thread_pool();
-
-#endif

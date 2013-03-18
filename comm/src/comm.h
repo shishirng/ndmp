@@ -31,11 +31,9 @@ struct client_endpoint {
 };
 
 struct comm_message {
-	int message_id;
-	int seq_num;
+	int is_tcp_connect;
 	char message[MAX_MESSAGE_SIZE];
 	int length;
-	int whence;
 };
 
 struct session {
