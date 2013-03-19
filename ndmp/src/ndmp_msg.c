@@ -97,6 +97,15 @@ void ndmp_error_message(struct client_txn *txn,
 			XDR* requeststream)
 {
 
+	struct ndmp_header reply_header;
+	XDR reply_stream;
+	set_header(header, &reply_header, NDMP_NOT_SUPPORTED_ERR);
+	txn->reply.length = xdr_sizeof((xdrproc_t) 
+				       xdr_ndmp_header,
+				       &reply_header);
+	xdrmem_create(&reply_stream, txn->reply.message, txn->reply.length,
+		      XDR_ENCODE);
+	xdr_ndmp_header(&reply_stream, &reply_header);
 }
 
 void ndmp_accept_notify(struct client_txn* txn, struct ndmp_header header, XDR* request_stream) 

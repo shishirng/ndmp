@@ -102,5 +102,32 @@ void ndmp_connect_close(struct client_txn *txn,
 	/* NDMP_CONNECT_CLOSE */
 	/* no request arguments */
 	/* no reply message */
+	
+	struct ndmp_header reply_header;
+	struct ndmp_session_info *session_info;
+	XDR reply_stream;
+
+	session_info = get_session_info(txn->client_session.session_id);
+	
+	enter_critical_section(session_info->s_lock);
+
+	/*
+	 * States set as per Figure 8 in NDMP V3 spec.
+	 */
+
+	session_info->connection_state = HALTED;
+	session_info->data_state = HALTED;
+	session_info->mover_state = HALTED;
+	set_header(header, &reply_header, 0);	
+
+	txn->reply.length = xdr_sizeof((xdrproc_t)
+                                       xdr_ndmp_header, &reply_header);
+
+	xdrmem_create(&reply_stream,
+                      txn->reply.message, txn->reply.length,XDR_ENCODE);
+	
+	xdr_ndmp_header(&reply_stream, &reply_header);
+
+	exit_critical_section(session_info->s_lock);
 }
 

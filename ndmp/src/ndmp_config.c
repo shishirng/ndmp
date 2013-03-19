@@ -9,6 +9,9 @@
 
 #include <ndmp.h>
 #include <comm.h>
+#include <unistd.h>
+#include <sys/utsname.h>
+#include <ndmp_msg.h>
 
 /*
  * Each of the functions below take a client_txn and an XDR request stream as
@@ -44,6 +47,46 @@ void ndmp_config_get_host_info(struct client_txn *txn, struct ndmp_header header
 	 *	string 		hostid<>;
 	 * };
 	 */
+	
+	struct ndmp_header reply_header;
+	struct ndmp_config_get_host_info_reply reply;
+	char hostname[32];
+	struct utsname os_info;
+	XDR reply_stream;
+
+	reply.error = NDMP_NO_ERR;
+
+	if (gethostname(hostname,32) != -1)
+		reply.hostname = hostname;
+	else
+		reply.error = NDMP_NOT_SUPPORTED_ERR;
+
+	if (uname(&os_info) != -1){
+		reply.os_type = os_info.sysname;
+		reply.os_vers = os_info.version;
+	}
+	else	 
+		reply.error = NDMP_NOT_SUPPORTED_ERR;
+
+	reply.hostid = "1"; 
+	
+	set_header(header, &reply_header, reply.error);
+	
+        txn->reply.length = xdr_sizeof((xdrproc_t)
+                                       xdr_ndmp_header, &reply_header);
+        txn->reply.length += xdr_sizeof((xdrproc_t)
+                                        xdr_ndmp_config_get_host_info_reply, &reply);
+	
+	xdrmem_create(&reply_stream,
+                      txn->reply.message, txn->reply.length,XDR_ENCODE);
+	
+        xdr_ndmp_header(&reply_stream, &reply_header);
+        if (reply.error == NDMP_NO_ERR)  {
+                xdr_ndmp_config_get_host_info_reply(&reply_stream, &reply);
+        }
+        else
+                txn->reply.length -= xdr_sizeof((xdrproc_t)
+						xdr_ndmp_config_get_host_info_reply, &reply);
 }
 
 void ndmp_config_get_connection_type(struct client_txn *txn, struct ndmp_header header, XDR* request_stream) 
@@ -67,6 +110,36 @@ void ndmp_config_get_connection_type(struct client_txn *txn, struct ndmp_header 
 	 * };
 	 *
 	 */
+
+	struct ndmp_header reply_header;
+	struct ndmp_config_get_connection_type_reply reply;
+	enum ndmp_addr_type addr_types[2] = {NDMP_ADDR_LOCAL, NDMP_ADDR_TCP};
+	XDR reply_stream;
+
+	reply.addr_types.addr_types_len = 2;
+	reply.addr_types.addr_types_val = addr_types;
+	reply.error = NDMP_NO_ERR;
+
+	set_header(header, &reply_header, reply.error);
+	
+        txn->reply.length = xdr_sizeof((xdrproc_t)
+                                       xdr_ndmp_header, &reply_header);
+        txn->reply.length += xdr_sizeof((xdrproc_t)
+                                        xdr_ndmp_config_get_connection_type_reply, 
+					&reply);
+	
+	xdrmem_create(&reply_stream,
+                      txn->reply.message, txn->reply.length,XDR_ENCODE);
+	
+        xdr_ndmp_header(&reply_stream, &reply_header);
+        if (reply.error == NDMP_NO_ERR)  {
+                xdr_ndmp_config_get_connection_type_reply(&reply_stream, &reply);
+        }
+        else
+                txn->reply.length -= xdr_sizeof((xdrproc_t)
+						xdr_ndmp_config_get_connection_type_reply, 
+						&reply);
+
 }
 
 void ndmp_config_get_auth_attr(struct client_txn *txn, struct ndmp_header header, XDR* request_stream) 
@@ -84,6 +157,48 @@ void ndmp_config_get_auth_attr(struct client_txn *txn, struct ndmp_header header
 	 * 	ndmp_auth_attr server_attr;
 	 * };
 	 */
+	
+	struct ndmp_header reply_header;
+	struct ndmp_config_get_auth_attr_request request;
+	struct ndmp_config_get_auth_attr_reply reply;
+	XDR reply_stream;
+	
+
+	xdr_ndmp_config_get_auth_attr_request(request_stream, &request);
+	
+	switch (request.auth_type) {
+	case NDMP_AUTH_NONE:
+		reply.server_attr.auth_type = NDMP_AUTH_NONE;
+		strcpy(reply.server_attr.ndmp_auth_attr_u.challenge, 
+		       ""); /* No challenge */
+		reply.error = NDMP_NO_ERR;
+		break;
+	case NDMP_AUTH_TEXT:
+	case NDMP_AUTH_MD5:
+	default: 
+		reply.error = NDMP_NOT_SUPPORTED_ERR; 
+	}
+
+	set_header(header, &reply_header, reply.error);
+	
+        txn->reply.length = xdr_sizeof((xdrproc_t)
+                                       xdr_ndmp_header, &reply_header);
+        txn->reply.length += xdr_sizeof((xdrproc_t)
+                                        xdr_ndmp_config_get_auth_attr_reply, 
+					&reply);
+	
+	xdrmem_create(&reply_stream,
+                      txn->reply.message, txn->reply.length,XDR_ENCODE);
+	
+        xdr_ndmp_header(&reply_stream, &reply_header);
+        if (reply.error == NDMP_NO_ERR)  {
+                xdr_ndmp_config_get_auth_attr_reply(&reply_stream, &reply);
+        }
+        else
+                txn->reply.length -= xdr_sizeof((xdrproc_t)
+						xdr_ndmp_config_get_auth_attr_reply, 
+						&reply);
+
 
 }
 
@@ -220,4 +335,36 @@ void ndmp_config_get_server_info(struct client_txn *txn, struct ndmp_header head
 	 * ndmp_auth_type auth_type<>;
 	 * };
 	 */
+
+	struct ndmp_header reply_header;
+	struct ndmp_config_get_server_info_reply reply;
+	enum ndmp_auth_type auth_types[1] = {NDMP_AUTH_NONE};
+	XDR reply_stream;
+
+	reply.vendor_name = "Red Hat, Inc.";
+	reply.product_name = "NDMP Server";
+	reply.revision_number = "0.1";
+	reply.auth_type.auth_type_len = 1;
+	reply.auth_type.auth_type_val = auth_types;
+	reply.error = NDMP_NO_ERR;
+
+	set_header(header, &reply_header, reply.error);
+	
+        txn->reply.length = xdr_sizeof((xdrproc_t)
+                                       xdr_ndmp_header, &reply_header);
+        txn->reply.length += xdr_sizeof((xdrproc_t)
+                                        xdr_ndmp_config_get_server_info_reply, 
+					&reply);
+	
+	xdrmem_create(&reply_stream,
+                      txn->reply.message, txn->reply.length,XDR_ENCODE);
+	
+        xdr_ndmp_header(&reply_stream, &reply_header);
+        if (reply.error == NDMP_NO_ERR)  {
+                xdr_ndmp_config_get_server_info_reply(&reply_stream, &reply);
+        }
+        else
+                txn->reply.length -= xdr_sizeof((xdrproc_t)
+						xdr_ndmp_config_get_server_info_reply, 
+						&reply);
 }
