@@ -214,13 +214,13 @@ int accept_all_connections(int listener, fd_set *read_socks,
 		txn = (struct client_txn *) malloc(sizeof(struct client_txn));
 
 		/*
-		 * Create a psuedo NDMP request for the tcp_connect request
-		 * so that a NDMP_NOTIFY_CONNECTED response
+		 * Create a pseudo NDMP request for the tcp_connect request
+		 * so that a NDMP_NOTIFY_CONNECTED request can be sent to client
 		 */
 
 		txn->client_session = *new_session;
-		txn->request.is_tcp_connect = 0;
-		//enqueue(ctx->request_jobs, txn);
+		txn->request.is_tcp_connect = 1;
+		enqueue(ctx->request_jobs, txn);
 		num_new_sessions++;
 	}
 	//	} while (endpoint.fd != -1);
@@ -263,7 +263,9 @@ void handle_a_client_request(int fd, struct comm_context *ctx)
 		 */
 		close(fd);
 		remove_elem(ctx->sessions, &tmp, session_comparator);
+		ctx->terminate_session(fd);/* mark this session as terminated */
 		free(txn);
+
 		printf("Detected socket closure\n");
 		return;
 	}

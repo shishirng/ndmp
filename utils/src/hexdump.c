@@ -15,7 +15,7 @@ void hexdump(void *buffer, unsigned int size)
 	int i, j;
 
 	for (i = 0; i < size; i += 16) {
-		printf("%08x  ", i);
+		printf("%04x  ", i);
 		dump_hex(buf, i, size);
 		dump_ascii(buf, i, size);
 	}

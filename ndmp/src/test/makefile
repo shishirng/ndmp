@@ -20,9 +20,8 @@ OBJS = $(ROOT)/ndmp/src/ndmp_connect.o \
 	$(ROOT)/utils/src/hexdump.o \
 	$(ROOT)/utils/src/queue.o
 
-all: testndmp
 
-testndmp: testndmp.c
+testndmp: 
 	gcc $(CFLAGS) -c testndmp.c 
 	gcc $(CFLAGS) -o testndmp testndmp.o $(OBJS) $(LIBS)
 

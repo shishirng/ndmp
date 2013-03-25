@@ -48,8 +48,12 @@ struct client_txn {
 };
 
 typedef void (*message_handler) (struct client_txn *);
+typedef int (*session_callback)(struct client_txn  *); 
+typedef void (*session_close)(int session_id);
 struct comm_context {
 	message_handler marshal_unmarshal;
+	session_callback cleanup_session;
+	session_close terminate_session;
 	struct queue_hdr *sessions;
 	struct queue_hdr *request_jobs;
 	struct queue_hdr *reply_jobs;

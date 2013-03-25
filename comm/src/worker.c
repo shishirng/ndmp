@@ -14,6 +14,7 @@ static pthread_t* threads = NULL;
 static int num_threads;
 void* run_job(void *context);
 void* process_response(void *context);
+extern int session_comparator(void *target, void *elem);
 
 void create_worker_threads(int thread_pool_size) 
 {
@@ -71,12 +72,6 @@ void* run_job(void *context)
 			}
 #endif
 			ctx->marshal_unmarshal(job);
-			
-			/*
-			 * Add response to response queue
-			 */	
-			enqueue(ctx->reply_jobs, job);
-
 			printf("Processed a job \n");
 			// Process next job
 		}
@@ -93,6 +88,7 @@ void *process_response(void *context)
 	int write_result;	
 	struct comm_context *ctx = (struct comm_context *)context;
 	struct client_txn *job;
+	struct session client_session;
 	while (1) {
 		
 		/*
@@ -103,9 +99,14 @@ void *process_response(void *context)
 	 	
 		if (job != NULL) {
 		 	// Write message to client			
-			write_result = write_message(job);
-			if (write_result == -1) 
-				printf("Write message error\n");
+			client_session = job->client_session;
+			if (get_elem(ctx->sessions, &client_session,
+				     session_comparator) != NULL) {
+				/* session still valid */
+				write_result = write_message(job);
+				if (write_result == -1) 
+					printf("Write message error\n");
+			}
 			free(job);
 		}
 		else 

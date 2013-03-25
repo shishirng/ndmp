@@ -16,6 +16,8 @@ main()
 {
 	struct comm_context *ctx = comm_context();
 	ctx->marshal_unmarshal = xdr_decode_encode;
+	ctx->cleanup_session = cleanup_session;
+	ctx->terminate_session = terminate_session;
 	comm_listen(ctx);
 }
 

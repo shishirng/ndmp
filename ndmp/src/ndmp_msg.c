@@ -11,8 +11,11 @@
 #include <ndmp.h>
 #include <time.h>
 #include <queue.h>
-int session_info_cmp (void *id, void *session);
 
+int session_info_cmp (void *id, void *session);
+int job_cmp(void *target, void*elem);
+void add_job_to_session(struct client_txn *txn);
+struct queue_hdr* get_session_queue() ;
 /*
  * xdr_decode_encode is the entry point
  * and callback method for the comm layer 
@@ -36,6 +39,7 @@ void xdr_decode_encode(struct client_txn *txn)
 	struct ndmp_header header;
 	char *buf, mesg_len[4];
 	int len;
+	struct comm_context *ctx = comm_context();
 	if (txn->request.is_tcp_connect == 1) {
 		header.message = 0xf001;
 	}
@@ -48,7 +52,11 @@ void xdr_decode_encode(struct client_txn *txn)
 
 		xdr_ndmp_header(&request_stream, &header);
 	}
-	
+	/*
+	 * Add job to session's job queue
+	 */
+
+	add_job_to_session(txn);
 	ndmp_dispatch(header.message)(txn, header, &request_stream);
 	
         buf = (char *)malloc(txn->reply.length+4);
@@ -58,7 +66,19 @@ void xdr_decode_encode(struct client_txn *txn)
 	xdr_int(&stream_len, &len);
 	memcpy(buf,mesg_len,4);
 	memcpy(txn->reply.message, buf, txn->reply.length+4);
-	txn->reply.length +=4;
+	txn->reply.length +=4;	
+	if (cleanup_session(txn) == 1) {
+		free(txn); /* client terminated. Don't send response */
+	}
+	else {
+		/* 
+		 * It is possible that at this point in time
+		 * or later before the response is sent the client
+		 * terminates. comm layer needs to check again for
+		 * client termination, before sending the response
+		 */
+		enqueue(ctx->reply_jobs, txn);
+	}
 	free(buf);
 }
 
@@ -114,13 +134,17 @@ void ndmp_accept_notify(struct client_txn* txn, struct ndmp_header header, XDR* 
 	struct ndmp_header reply_header;
 	XDR reply_stream;
 
-	header.sequence = 0;
-	header.message = 0x0502;
 	reply.reason = NDMP_CONNECTED;
 	reply.protocol_version = 3;
-	reply.text_reason = "";
+	reply.text_reason = "Successful connection";
 	
-	set_header(header, &reply_header, NDMP_NO_ERR);
+	reply_header.sequence = get_next_seq_number();
+	reply_header.time_stamp = (u_long) time(NULL);
+	reply_header.message_type = NDMP_MESSAGE_REQUEST;
+	reply_header.message = NDMP_NOTIFY_CONNECTED;
+	reply_header.reply_sequence = 0;
+	reply_header.error = NDMP_NO_ERR;
+
 	txn->reply.length = xdr_sizeof((xdrproc_t) 
 				       xdr_ndmp_header,
 				       &reply_header);
@@ -155,9 +179,30 @@ void set_header(ndmp_header req, ndmp_header *reply, ndmp_error err)
 } 
 
 
+/*
+ * get_session_queue can be called from
+ * different threads concurrently. 
+ * Needs to be thread-safe. 
+ */
+
+struct queue_hdr* get_session_queue() 
+{
+	static struct queue_hdr *session_info_queue = NULL;
+	struct lock *s_lock = get_lock();
+	enter_critical_section(s_lock);
+
+	if (session_info_queue == NULL) {	
+		session_info_queue = init_queue();
+	}
+	exit_critical_section(s_lock);
+
+	return session_info_queue;
+}
+
 struct ndmp_session_info* get_session_info(int session_id) {
 
-	static struct queue_hdr *session_info_queue = NULL;
+
+	struct queue_hdr* session_queue;
 	struct ndmp_session_info *retval;
 	struct lock *s_lock = get_lock();
 
@@ -172,9 +217,8 @@ struct ndmp_session_info* get_session_info(int session_id) {
 	 *
 	 */
 	enter_critical_section(s_lock);
-	if (session_info_queue == NULL) {	
-		session_info_queue = init_queue();
-	}
+	
+	session_queue = get_session_queue();
 	
 	/*
 	 * Since we create a new sessions 
@@ -182,7 +226,7 @@ struct ndmp_session_info* get_session_info(int session_id) {
 	 * thread-safe
 	 */
 
-	retval = get_elem(session_info_queue, (void *)&session_id,
+	retval = get_elem(session_queue, (void *)&session_id,
 			  session_info_cmp);
 	if (retval == NULL) {
 
@@ -198,7 +242,9 @@ struct ndmp_session_info* get_session_info(int session_id) {
 		retval->data_state = LISTEN;
 		retval->mover_state = LISTEN;
 		retval->s_lock = get_lock();
-		enqueue(session_info_queue, retval);
+		retval->jobs = init_queue();
+		retval->is_terminated = 0;
+		enqueue(session_queue, retval);
 	}	
 	exit_critical_section(s_lock);
 	return retval;
@@ -212,4 +258,73 @@ int session_info_cmp (void *id, void *session)
 	
 	return session_id == queue_elem_session_id;
 }
-		
+
+/*
+ * Each NDMP request (job) that is handled is added
+ * to an outstanding jobs queue till it is processed
+ * and completed.
+ */
+
+void add_job_to_session(struct client_txn *txn)
+{
+	struct ndmp_session_info *session;
+
+	session = get_session_info(txn->client_session.session_id);
+	enqueue(session->jobs, txn);
+}		
+/*
+ * Each session will have outstanding jobs held in 
+ * a queue; one queue element for each request in 
+ * a thread. cleanup_session  is a callback method that
+ * the comm layer will call back on the worker thread
+ * after it has sent the response. 
+ * We remove the client_txn (txn) from the session job
+ * queue. 
+ *
+ * If all jobs are done and the session is terminated, 
+ * we remove the session from the session queue.
+ *
+ */
+
+int cleanup_session(struct client_txn *txn) 
+{
+	struct ndmp_session_info *session;
+	struct queue_hdr *session_queue;
+
+	session = get_session_info(txn->client_session.session_id);
+	remove_elem(session->jobs, txn, job_cmp);
+	if (session->is_terminated) {
+		/*
+		 * If all jobs are done, remove session
+		 */
+		if (num_elems(session->jobs) == 0) {
+			session_queue = get_session_queue();
+			remove_elem(session_queue,
+				    &session->session_id,
+				    session_info_cmp);
+			free(session);
+		}
+		return 1; /* session terminated */
+	}
+	return 0; /* session active */
+}
+
+int job_cmp(void *target, void *elem) 
+{
+	return target == elem;
+}
+
+/*
+ * terminate_session is called to indicate the
+ * termination of client - socket close event at comm layer
+ * When a session is marked for termination, results/responses for
+ * outstanding jobs are not sent back to comm layer. 
+ */
+
+void terminate_session(int session_id)
+{
+	struct ndmp_session_info *session;
+	
+	session = get_session_info(session_id);
+	session->is_terminated = 1;
+}

@@ -14,6 +14,7 @@
 #include <rpc/xdr.h>
 #include <ndmp.h>
 #include <locks.h>
+#include <queue.h>
 
 enum ndmp_state {IDLE, LISTEN, CONNECTED, ACTIVE, HALTED};
 struct ndmp_session_info {
@@ -22,6 +23,8 @@ struct ndmp_session_info {
 	enum ndmp_state data_state;
 	enum ndmp_state mover_state;	
 	struct lock *s_lock; /* for thread-safe updates to session states */
+	struct queue_hdr *jobs; /* outstanding client requests */
+	int is_terminated;
 };
 
 /*
@@ -51,10 +54,31 @@ typedef void (*ndmp_message_handler)(struct client_txn *txn,
 
 ndmp_message_handler ndmp_dispatch(int message_type);
 
+
+/*
+ * Each session will have outstanding jobs held in 
+ * a queue; one queue element for each request in 
+ * a thread. We remove the client_txn (txn) from 
+ * the session job queue. 
+ */
+
+int cleanup_session(struct client_txn *txn);
+
+/*
+ * terminate_session is called to indicate the
+ * termination of client - socket close event at comm layer
+ * When a session is marked for termination, results/responses for
+ * outstanding jobs are not sent back to comm layer. 
+ */
+
+void terminate_session(int session_id);
+
 /*
  * get_next_seq_number returns the next number in
  * sequence for messages
  */
+
+
 int get_next_seq_number();
 
 /*
