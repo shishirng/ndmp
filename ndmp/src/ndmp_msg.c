@@ -138,7 +138,7 @@ void ndmp_accept_notify(struct client_txn* txn, struct ndmp_header header, XDR* 
 
 	reply.reason = NDMP_CONNECTED;
 	reply.protocol_version = 3;
-	reply.text_reason = "";
+	reply.text_reason = "SUCCESSFUL CONNECTION";
 	
 	reply_header.sequence = get_next_seq_number();
 	reply_header.time_stamp = (u_long) time(NULL);
