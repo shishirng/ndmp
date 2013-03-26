@@ -18,13 +18,13 @@
 
 enum ndmp_state {IDLE, LISTEN, CONNECTED, ACTIVE, HALTED};
 struct ndmp_session_info {
-	int session_id;
-	enum ndmp_state connection_state;
-	enum ndmp_state data_state;
-	enum ndmp_state mover_state;	
-	struct lock *s_lock; /* for thread-safe updates to session states */
-	struct queue_hdr *jobs; /* outstanding client requests */
-	int is_terminated;
+        int session_id;
+        enum ndmp_state connection_state;
+        enum ndmp_state data_state;
+        enum ndmp_state mover_state;    
+        struct lock *s_lock; /* for thread-safe updates to session states */
+        struct queue_hdr *jobs; /* outstanding client requests */
+        int is_terminated;
 };
 
 /*
@@ -44,8 +44,8 @@ void xdr_decode_encode(struct client_txn *txn);
  */
 
 typedef void (*ndmp_message_handler)(struct client_txn *txn, 
-				     ndmp_header header,
-				     XDR* request_stream);
+                                     ndmp_header header,
+                                     XDR* request_stream);
 
 /*
  * ndmp_dispatch determines the message handler for a given
@@ -88,7 +88,7 @@ int get_next_seq_number();
  */
             
  void set_header(struct ndmp_header request, 
-		 struct ndmp_header *reply, ndmp_error err);
+                 struct ndmp_header *reply, ndmp_error err);
 /*
  *
  * struct_ndmp_session_info* get_session_info(int session_id) 

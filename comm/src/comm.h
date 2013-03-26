@@ -26,40 +26,40 @@
 
 
 struct client_endpoint {
-	struct sockaddr_in client;	
-	int fd;
+        struct sockaddr_in client;      
+        int fd;
 };
 
 struct comm_message {
-	int is_tcp_connect;
-	char message[MAX_MESSAGE_SIZE];
-	int length;
+        int is_tcp_connect;
+        char message[MAX_MESSAGE_SIZE];
+        int length;
 };
 
 struct session {
-	int session_id;
-	struct client_endpoint client_info;
+        int session_id;
+        struct client_endpoint client_info;
 };
 
 struct client_txn {
-	struct session client_session;
-	struct comm_message request;
-	struct comm_message reply;
+        struct session client_session;
+        struct comm_message request;
+        struct comm_message reply;
 };
 
 typedef void (*message_handler) (struct client_txn *);
 typedef int (*session_callback)(struct client_txn  *); 
 typedef void (*session_close)(int session_id);
 struct comm_context {
-	message_handler marshal_unmarshal;
-	session_callback cleanup_session;
-	session_close terminate_session;
-	struct queue_hdr *sessions;
-	struct queue_hdr *request_jobs;
-	struct queue_hdr *reply_jobs;
-	int maxfds;
+        message_handler marshal_unmarshal;
+        session_callback cleanup_session;
+        session_close terminate_session;
+        struct queue_hdr *sessions;
+        struct queue_hdr *request_jobs;
+        struct queue_hdr *reply_jobs;
+        int maxfds;
 };
-	
+        
 struct comm_context* comm_context(); /* creates/returns comm_context struct */
 void comm_listen(struct comm_context *); /* listens for messages */
 #endif

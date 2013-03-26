@@ -12,7 +12,7 @@
 #include <pthread.h>
 
 struct lock {
-	pthread_mutex_t mutex;
+        pthread_mutex_t mutex;
 
 };
 
