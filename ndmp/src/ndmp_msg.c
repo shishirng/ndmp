@@ -59,15 +59,7 @@ void xdr_decode_encode(struct client_txn *txn)
 	add_job_to_session(txn);
 	ndmp_dispatch(header.message)(txn, header, &request_stream);
 	
-        buf = (char *)malloc(txn->reply.length+4);
-	memcpy(buf+4,txn->reply.message,txn->reply.length);
-	len = txn->reply.length | (1<<31);
-	xdrmem_create(&stream_len,mesg_len,4, XDR_ENCODE);
-	xdr_int(&stream_len, &len);
-	memcpy(buf,mesg_len,4);
-	memcpy(txn->reply.message, buf, txn->reply.length+4);
-	txn->reply.length +=4;	
-	if (cleanup_session(txn) == 1) {
+	if (cleanup_session(txn) == 1 || txn->reply.length == 0) {
 		free(txn); /* client terminated. Don't send response */
 	}
 	else {
@@ -77,9 +69,19 @@ void xdr_decode_encode(struct client_txn *txn)
 		 * terminates. comm layer needs to check again for
 		 * client termination, before sending the response
 		 */
+
+		buf = (char *)malloc(txn->reply.length+4);
+		memcpy(buf+4,txn->reply.message,txn->reply.length);
+		len = txn->reply.length | (1<<31);
+		xdrmem_create(&stream_len,mesg_len,4, XDR_ENCODE);
+		xdr_int(&stream_len, &len);
+		memcpy(buf,mesg_len,4);
+		memcpy(txn->reply.message, buf, txn->reply.length+4);
+		txn->reply.length +=4;
 		enqueue(ctx->reply_jobs, txn);
+		free(buf);
 	}
-	free(buf);
+
 }
 
 ndmp_message_handler ndmp_dispatch(int message) {
@@ -136,7 +138,7 @@ void ndmp_accept_notify(struct client_txn* txn, struct ndmp_header header, XDR* 
 
 	reply.reason = NDMP_CONNECTED;
 	reply.protocol_version = 3;
-	reply.text_reason = "Successful connection";
+	reply.text_reason = "";
 	
 	reply_header.sequence = get_next_seq_number();
 	reply_header.time_stamp = (u_long) time(NULL);
@@ -145,6 +147,7 @@ void ndmp_accept_notify(struct client_txn* txn, struct ndmp_header header, XDR* 
 	reply_header.reply_sequence = 0;
 	reply_header.error = NDMP_NO_ERR;
 
+	//set_header(header, &reply_header, NDMP_NO_ERR);
 	txn->reply.length = xdr_sizeof((xdrproc_t) 
 				       xdr_ndmp_header,
 				       &reply_header);
