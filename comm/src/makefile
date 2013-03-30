@@ -1,6 +1,7 @@
 CFLAGS = -g -I . -I ../../utils/src -DDEBUG
 
 all: comm.o worker.o
+	(cd test; make);
 
 comm.o: comm.c comm.h
 	gcc $(CFLAGS) -c comm.c 
@@ -10,3 +11,4 @@ worker.o: worker.h worker.c comm.h
 
 clean:
 	rm *.o
+	(cd test; make clean);

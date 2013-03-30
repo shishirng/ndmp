@@ -5,6 +5,7 @@ CFLAGS = -g -I. -I$(COM)/src -I$(UTILS)/src -DDEBUG
 HEADERS = ndmp.h ndmp_msg.h
 
 all: ndmp_xdr.o ndmp_config.o ndmp_connect.o ndmp_msg.o 
+	(cd test; make)
 
 ndmp.h: ndmp.x
 	rpcgen ndmp.x
@@ -23,3 +24,4 @@ ndmp_msg.o: ndmp_msg.c $(HEADERS)
 
 clean:
 	rm *.o ndmp.h ndmp_xdr.c
+	(cd test; make clean)

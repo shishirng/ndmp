@@ -24,19 +24,10 @@ struct thread_args {
 void set_up_job_queue(struct queue_hdr* queue, int num_jobs);
 void check_job_queue(struct queue_hdr* queue, int num_jobs, int num_threads);
 void *get_jobs(void *queue);
-void queue_cmp(void *target, void *elem);
+int queue_cmp(void *target, void *elem);
 void *get_and_remove_jobs(void *args);
 
-int main() 
-{
-	struct queue_hdr *job_queue = init_queue();
-	set_up_job_queue(job_queue, 100);
-	check_job_queue(job_queue, 100, 10);
-	printf("Multi-threaded enqueue-dequeue test passed\n");
-	set_up_job_queue(job_queue, 100);
-	check_job_removal(job_queue, 100, 10);
-	printf("Multi-threaded check_job_removal test passed\n");
-}
+
 
 void add_a_job(struct queue_hdr *job_queue, int i)
 {
@@ -130,4 +121,15 @@ void *get_and_remove_jobs(void *args)
 int queue_cmp(void *target, void *elem)
 {
 	return (*((int *) target) == *((int *) elem));
+}
+
+int main() 
+{
+	struct queue_hdr *job_queue = init_queue();
+	set_up_job_queue(job_queue, 100);
+	check_job_queue(job_queue, 100, 10);
+	printf("Multi-threaded enqueue-dequeue test passed\n");
+	set_up_job_queue(job_queue, 100);
+	check_job_removal(job_queue, 100, 10);
+	printf("Multi-threaded check_job_removal test passed\n");
 }

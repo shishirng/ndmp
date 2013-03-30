@@ -1,5 +1,6 @@
 CFLAGS = -g -I  .
 all: queue.o  locks.o hexdump.o
+	(cd test; make)
 
 queue.o: queue.h queue.c locks.c
 	gcc $(CFLAGS) -c queue.c
@@ -12,3 +13,4 @@ hexdump.o: hexdump.c hexdump.h
 
 clean:
 	rm *.o
+	(cd test; make clean)
