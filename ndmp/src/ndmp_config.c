@@ -152,7 +152,6 @@ void ndmp_config_get_connection_type(struct client_txn *txn, struct ndmp_header 
                 txn->reply.length -= xdr_sizeof((xdrproc_t)
                                                 xdr_ndmp_config_get_connection_type_reply, 
                                                 &reply);
-
 }
 
 void ndmp_config_get_auth_attr(struct client_txn *txn, struct ndmp_header header, XDR* request_stream) 
@@ -709,7 +708,7 @@ struct ndmp_config_get_scsi_info_reply* alloc_scsi_info() {
          * We will assume max of 16 name-value properties for each
          * device, which should also be plenty. 
          * These assumptions simplify getting scsi information
-         * and setting them in struct ndmp_config_get_scsi_info_repy
+         * and setting them in struct ndmp_config_get_scsi_info_reply
          * especially having to set info_len attribute and capability_len
          * attributes. It would require a two pass traversal of scsi device
          * info, otherwise.
