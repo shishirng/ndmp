@@ -72,8 +72,9 @@ void ndmp_data_start_backup(struct client_txn *txn,
 	         * };
 	         *
 	         */
+#ifdef DEBUG
 	        printf("Printing from the data Start backup \n");
-
+#endif
 		static bool mount_done = FALSE ;
 	        struct ndmp_data_start_backup_request request;
 	        struct ndmp_header reply_header;
@@ -101,10 +102,13 @@ void ndmp_data_start_backup(struct client_txn *txn,
 		                data_env->env_val[i].name = (char*) malloc(64*sizeof(char));
 				data_env->env_val[i].value = (char*) malloc(64*sizeof(char));
 		        }
-
+#ifdef DEBUG
 	        printf("before xdr decoding\n ");
+#endif
 	        xdr_ndmp_data_start_backup_request(request_stream, &request);
+#ifdef DEBUG
 	        printf("after xdr decoding \n");
+#endif
 	        enter_critical_section(session_info->s_lock);
 	        reply.error = NDMP_NO_ERR;
 
@@ -119,14 +123,14 @@ void ndmp_data_start_backup(struct client_txn *txn,
 
 	        char full_ip[30]="";
 	        strcpy(full_ip,inet_ntoa(txn->client_session.client_info.client.sin_addr));
-
+#ifdef DEBUG
 	        printf("printing full ip : %s \n",full_ip);
 
 	        printf("after xdr decoding : Printing from the data Start backup \n");
 
 	        printf("Butype : %s \n",request.bu_type );
 	        printf("ENV variables \n");
-
+#endif
 
 	        ndmp_pval* env_val = request.env.env_val;
 	        u_long env_len = request.env.env_len;
@@ -168,12 +172,11 @@ void ndmp_data_start_backup(struct client_txn *txn,
 	        char vol_name[20];
 	        printf("enter the volume name : ");
 	        scanf("%s",vol_name );
-
+#ifdef DEBUG
 	        printf("printing volume name 11 : %s \n", vol_name);
-
 	        // create mount point dir
 	        printf("creating the mounting dir \n");
-
+#endif
 	       char *mount_point;
 	       mount_point = (char*) malloc(16 * sizeof(char));
 	       // char mount_point[300];
@@ -181,7 +184,7 @@ void ndmp_data_start_backup(struct client_txn *txn,
 	        mount_point = (char*) realloc ( mount_point,strlen(mount_point) + strlen(full_ip) + strlen(client_path) +1 );
 	        strcat(mount_point,full_ip);
 	        strcat(mount_point,client_path);
-	        // mount point doesnot has / at the end
+	        // mount point does not has / at the end
 
 	        char *dir_instr;
 	        dir_instr = (char*) malloc( 11 * sizeof(char));
@@ -189,9 +192,9 @@ void ndmp_data_start_backup(struct client_txn *txn,
 	        strcpy(dir_instr,"mkdir -p ");
 	        dir_instr = (char*) realloc(dir_instr,strlen(dir_instr) + strlen(mount_point)+1);
 	        strcat(dir_instr,mount_point);
-
+#ifdef DEBUG
 	        printf("\nprinting mount instr $ %s \n",dir_instr);
-
+#endif
 	        if(system(dir_instr) <0){
 	               printf("mount point creation failed or already exists \n");
 	        }
@@ -201,17 +204,14 @@ void ndmp_data_start_backup(struct client_txn *txn,
 	        //char mount_instr[400];
 	        strcpy(mount_instr,"mount -t glusterfs ");
 	        mount_instr = (char*) realloc( mount_instr , strlen(mount_instr) + 17+ strlen(vol_name) + strlen(mount_point));
-	        strcat(mount_instr,"10.70.1.93:/");
+	        strcat(mount_instr,"10.70.1.93:/");	//where to mount, currently ajeet's laptop
 	        strcat(mount_instr,vol_name);
 	        strcat(mount_instr," ");
 	        strcat(mount_instr,mount_point);
-
+#ifdef DEBUG
 	        printf("printing volume name 1 : %s \n ",vol_name );
-
-
-
 	        printf("\nprinting mount instr $ %s \n",mount_instr);
-
+#endif
 		if(mount_done == FALSE ){
 	        	if(system(mount_instr) <0){
 	                	printf("failed : mount volume \n");
@@ -233,9 +233,9 @@ void ndmp_data_start_backup(struct client_txn *txn,
 	        strcat(rsync_instr, client_path);
 	        strcat(rsync_instr,"/ ");
 	        strcat(rsync_instr,mount_point);
-
+#ifdef DEBUG
 	        printf("printing rsync instr $ %s \n",rsync_instr);
-
+#endif
 	        if(system(rsync_instr) <0){
 	                printf("failed : rsync \n");
 	                return;
@@ -255,7 +255,9 @@ void ndmp_data_start_backup(struct client_txn *txn,
 		session_info->data_state = NDMP_DATA_STATE_HALTED;
 
 	        exit_critical_section(session_info->s_lock);
+#ifdef DEBUG
 	        printf("Exiting data start backup \n ");
+#endif
 }
 
 void ndmp_data_start_recover(struct client_txn *txn,
@@ -282,9 +284,9 @@ void ndmp_data_start_recover(struct client_txn *txn,
 	         *              ndmp_error error;
 	         *      };
 	         */
-
+#ifdef DEBUG
 	        printf("Printing from the data Start Recovery \n");
-
+#endif
 	        struct ndmp_data_start_recover_request request;
 	        struct ndmp_header reply_header;
 	        struct ndmp_data_start_recover_reply reply;
@@ -317,10 +319,13 @@ void ndmp_data_start_recover(struct client_txn *txn,
 	                request.nlist.nlist_val[i].new_name = (char*) malloc(64*sizeof(char));
 	                request.nlist.nlist_val[i].other_name = (char*) malloc(64*sizeof(char));
 	        }
-
+#ifdef DEBUG
 	        printf("before xdr decoding\n ");
+#endif
 	        xdr_ndmp_data_start_recover_request(request_stream, &request);
+#ifdef DEBUG
 	        printf("after xdr decoding \n");
+#endif
 	        enter_critical_section(session_info->s_lock);
 	        reply.error = NDMP_NO_ERR;
 
@@ -349,9 +354,9 @@ void ndmp_data_start_recover(struct client_txn *txn,
 	                val_buf = (char*)malloc(strlen(env_val[i].value)+1);
 	                strcpy(name_buf,env_val[i].name);
 	                strcpy(val_buf,env_val[i].value);
-
+#ifdef DEBUG
 	                printf("\nname : %s \nvalue : %s \n\n",name_buf,val_buf);
-
+#endif
 	                if(strcmp(env_val[i].name,"FILESYSTEM") ==0 ) {
 	                        client_path = (char*) malloc (strlen(env_val[i].value) +1 );
 	                        strcpy(client_path,env_val[i].value);
@@ -362,10 +367,10 @@ void ndmp_data_start_recover(struct client_txn *txn,
 	                }
 
 	        }
-
+#ifdef DEBUG
 	        // obtaining mount point dir
 	        printf("obtaining the dir/file to recover \n");
-
+#endif
 	        char *mount_point;
 	        mount_point = (char*) malloc(16*sizeof(char) );
 	       //char mount_point[300];
@@ -393,9 +398,9 @@ void ndmp_data_start_recover(struct client_txn *txn,
 	        strcat(rsync_instr,":");
 	        strcat(rsync_instr, request.nlist.nlist_val[0].destination_dir);
 	        //strcat(rsync_instr,"/");
-
+#ifdef DEBUG
 	        printf("printing rsync instr $ %s \n",rsync_instr);
-
+#endif
 	        if(system(rsync_instr) <0){
 	                printf("failed : rsync \n");
 	                return;
@@ -417,12 +422,64 @@ void ndmp_data_start_recover(struct client_txn *txn,
 
 
 	        exit_critical_section(session_info->s_lock);
+#ifdef DEBUG
 	        printf("Exiting data start recover \n ");
+#endif
 }
 
 void ndmp_data_abort(struct client_txn *txn,
                                struct ndmp_header header, XDR* request_stream)
 {
+	/* NDMP_DATA_ABORT
+	 *
+	 * no request arguments
+	 *
+	 * struct ndmp_data_abort_reply
+	 * {
+	 * 	ndmp_error error;
+	 * };
+	 *
+	 */
+
+		struct ndmp_header reply_header;
+		struct ndmp_data_abort_reply reply;
+		struct ndmp_session_info *session_info;
+
+		XDR reply_stream;
+
+		session_info = get_session_info(txn->client_session.session_id);
+		enter_critical_section(session_info->s_lock);
+
+		if (session_info-> data_state == NDMP_DATA_STATE_HALTED || session_info-> data_state == NDMP_DATA_STATE_IDLE){
+		        reply.error = NDMP_ILLEGAL_STATE_ERR;
+		}
+		else {
+			session_info->data_state = NDMP_DATA_STATE_HALTED;
+			reply.error = NDMP_NO_ERR;
+		}
+
+		set_header(header, &reply_header, reply.error);
+
+		txn->reply.length = xdr_sizeof((xdrproc_t)
+		                                       xdr_ndmp_header, &reply_header);
+		txn->reply.length += xdr_sizeof((xdrproc_t)
+		                                        xdr_ndmp_data_abort_reply, &reply);
+
+		xdrmem_create(&reply_stream,
+			                      txn->reply.message, txn->reply.length,XDR_ENCODE);
+
+		xdr_ndmp_header(&reply_stream, &reply_header);
+
+		if (reply.error == NDMP_NO_ERR)
+		        xdr_ndmp_data_abort_reply(&reply_stream, &reply);
+	        else
+	                txn->reply.length -= xdr_sizeof((xdrproc_t)
+	                                        xdr_ndmp_data_abort_reply, &reply);
+
+		exit_critical_section(session_info->s_lock);
+#ifdef DEBUG
+		printf("Data state: %d\n",session_info->data_state);
+#endif
 
 }
 
@@ -451,12 +508,8 @@ void ndmp_data_get_env(struct client_txn *txn,
 
 	enter_critical_section(session_info->s_lock);
 
-	printf("Inside get-env's critical section\n");
-
 	reply.error = NDMP_NO_ERR;
 	reply.env.env_len = data_env->env_len;
-
-	printf("number of env variables: %d\n", data_env->env_len);
 
 	reply.env.env_val = (ndmp_pval*)malloc(8*sizeof(ndmp_pval) );
 
@@ -556,9 +609,9 @@ void ndmp_data_stop(struct client_txn *txn,
                                         xdr_ndmp_data_stop_reply, &reply);
 
 	exit_critical_section(session_info->s_lock);
-
+#ifdef DEBUG
 	printf("Data state: %d\n",session_info->data_state);
-
+#endif
 }
 
 void ndmp_data_listen(struct client_txn *txn,
@@ -623,8 +676,8 @@ void ndmp_data_listen(struct client_txn *txn,
 	}
 	else{
 		if(request.addr_type== NDMP_ADDR_LOCAL ){
-	                session_info->data_state = NDMP_DATA_STATE_CONNECTED;
-	                // change the state to connected
+	                session_info->data_state = NDMP_DATA_STATE_LISTEN;
+	                // change the state to listen
 	                reply.data_connection_addr.addr_type = NDMP_ADDR_LOCAL;
 	               // reply.data_connection_addr.ndmp_addr_u = NULL;
 	        }
@@ -671,11 +724,11 @@ void ndmp_data_connect(struct client_txn *txn, struct ndmp_header header, XDR* r
         XDR reply_stream;
 
         xdr_ndmp_data_connect_request(request_stream, &request);
-
+#ifdef DEBUG
 	printf("Printing from the data connect open \n");
 	printf("Request message received : \
 		addr_type : %d \n ",request.addr.addr_type);
-
+#endif
         session_info = get_session_info(txn->client_session.session_id);
 
         enter_critical_section(session_info->s_lock);
