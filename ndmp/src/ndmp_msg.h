@@ -114,5 +114,14 @@ void ndmp_config_get_fs_info(struct client_txn *, struct ndmp_header, XDR*);
 void ndmp_config_get_tape_info(struct client_txn *, struct ndmp_header, XDR*);
 void ndmp_config_get_scsi_info(struct client_txn *, struct ndmp_header, XDR*);
 void ndmp_config_get_server_info(struct client_txn *, struct ndmp_header, XDR*);
+void ndmp_data_get_state(struct client_txn *, struct ndmp_header, XDR*);
+void ndmp_data_start_backup(struct client_txn *, struct ndmp_header, XDR*);
+void ndmp_data_start_recover(struct client_txn *, struct ndmp_header, XDR*);
+void ndmp_data_abort(struct client_txn *, struct ndmp_header, XDR*);
+void ndmp_data_get_env(struct client_txn *, struct ndmp_header, XDR*);
+void ndmp_data_stop(struct client_txn *, struct ndmp_header, XDR*);
+void ndmp_data_listen(struct client_txn *, struct ndmp_header, XDR*);
+void ndmp_data_connect(struct client_txn *, struct ndmp_header, XDR*);
 void ndmp_error_message(struct client_txn *, struct ndmp_header, XDR *); // For wrong message type
+
 #endif

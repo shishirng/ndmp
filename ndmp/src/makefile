@@ -4,7 +4,7 @@ UTILS=$(ROOT)/utils
 CFLAGS = -g -I. -I$(COM)/src -I$(UTILS)/src -DDEBUG
 HEADERS = ndmp.h ndmp_msg.h
 
-all: ndmp_xdr.o ndmp_config.o ndmp_connect.o ndmp_msg.o 
+all: ndmp_xdr.o ndmp_config.o ndmp_connect.o ndmp_data.o ndmp_msg.o 
 	(cd test; make)
 
 ndmp.h: ndmp.x
@@ -18,6 +18,9 @@ ndmp_config.o: ndmp_config.c $(HEADERS)
 
 ndmp_connect.o: ndmp_connect.c $(HEADERS)
 	gcc $(CFLAGS) -c ndmp_connect.c 
+	
+ndmp_data.o: ndmp_data.c $(HEADERS)
+	gcc $(CFLAGS) -c ndmp_data.c
 
 ndmp_msg.o: ndmp_msg.c $(HEADERS)
 	gcc $(CFLAGS) -c ndmp_msg.c 

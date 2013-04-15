@@ -1,4 +1,5 @@
 makefile
+ndmp_data.c
 ndmp_config.c
 ndmp_connect.c
 ndmp.h

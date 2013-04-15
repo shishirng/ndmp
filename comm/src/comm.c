@@ -175,7 +175,6 @@ void comm_listen(struct comm_context *ctx)
                 }
 
         }
-
 }
 
 int accept_all_connections(int listener, fd_set *read_socks,

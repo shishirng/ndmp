@@ -16,6 +16,7 @@ int session_info_cmp (void *id, void *session);
 int job_cmp(void *target, void*elem);
 void add_job_to_session(struct client_txn *txn);
 struct queue_hdr* get_session_queue() ;
+
 /*
  * xdr_decode_encode is the entry point
  * and callback method for the comm layer 
@@ -109,6 +110,22 @@ ndmp_message_handler ndmp_dispatch(int message) {
                 return ndmp_config_get_scsi_info;
         case 0x108:
                 return ndmp_config_get_server_info;
+        case 0x400:
+        	return ndmp_data_get_state;
+        case 0x401:
+        	return ndmp_data_start_backup;
+        case 0x402:
+        	return ndmp_data_start_recover;
+        case 0x403:
+        	return ndmp_data_abort;
+        case 0x404:
+        	return ndmp_data_get_env;
+        case 0x407:
+        	return ndmp_data_stop;
+        case 0x409:
+        	return ndmp_data_listen;
+        case 0x40A:
+        	return ndmp_data_connect;
         default:
                 return ndmp_error_message;
         }
@@ -210,7 +227,7 @@ struct ndmp_session_info* get_session_info(int session_id) {
         struct lock *s_lock = get_lock();
 
         /*
-         * This functon returns the ndmp_session_info 
+         * This function returns the ndmp_session_info
          * struct. The ndmp_session_info structs are in 
          * a queue, keyed by session_id. The states are 
          * owned and managed by the caller(s). The queue 
@@ -242,8 +259,8 @@ struct ndmp_session_info* get_session_info(int session_id) {
                         sizeof(struct ndmp_session_info));
                 retval->session_id = session_id;
                 retval->connection_state  = LISTEN;
-                retval->data_state = LISTEN;
-                retval->mover_state = LISTEN;
+                retval->data_state = IDLE;
+                retval->mover_state = IDLE;
                 retval->s_lock = get_lock();
                 retval->jobs = init_queue();
                 retval->is_terminated = 0;

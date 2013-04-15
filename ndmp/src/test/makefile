@@ -11,6 +11,7 @@ SRC = testndmp.c
 CFLAGS = -g -I $(ROOT)/comm/src -I $(ROOT)/ndmp/src -I $(ROOT)/utils/src -DDEBUG
 LIBS = -lpthread
 OBJS = $(ROOT)/ndmp/src/ndmp_connect.o \
+	$(ROOT)/ndmp/src/ndmp_data.o \
 	$(ROOT)/ndmp/src/ndmp_msg.o \
 	$(ROOT)/ndmp/src/ndmp_config.o \
 	$(ROOT)/ndmp/src/ndmp_xdr.o \
