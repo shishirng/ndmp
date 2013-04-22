@@ -7,9 +7,16 @@
  * cases as published by the Free Software Foundation.
  */
 
+/*
+ * This file and its components written by Ajeet
+ * unless specified otherwise.
+ */
+
 #include <ndmp.h>
 #include <comm.h>
 #include <ndmp_msg.h>
+
+/* Comments by Shrinidhi */
 
 /*
  * Each of the functions below take a client_txn and an XDR request stream as

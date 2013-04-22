@@ -8,7 +8,7 @@
  */
 
 /*
- * This file and its functions written by Shrinidhi
+ * This file and its components written by Shrinidhi
  * unless specified otherwise.
  */
 

@@ -7,16 +7,25 @@
  * cases as published by the Free Software Foundation.
  */
 
+/*
+ * This file and its components written by Ajeet
+ * unless specified otherwise.
+ */
+
 #include <ndmp.h>
 #include <comm.h>
 #include <ndmp_msg.h>
 #include <stdbool.h>
+
+/* Written by Shrinidhi */
 
 struct environment
 {
         u_int env_len;
         ndmp_pval *env_val;
 };
+
+/* Written by Shrinidhi */
 
 struct environment* get_environment()
 {
@@ -28,6 +37,8 @@ struct environment* get_environment()
         }
         return retval;
 }
+
+/* Written by Shrinidhi */
 
 struct environment* init_environment()
 {
@@ -601,6 +612,8 @@ void ndmp_data_start_recover(struct client_txn *txn,
                 exit_critical_section(session_info->s_lock);
 }
 
+/* Written by Shrinidhi */
+
 void ndmp_data_abort(struct client_txn *txn,
                                struct ndmp_header header, XDR* request_stream)
 {
@@ -656,6 +669,8 @@ void ndmp_data_abort(struct client_txn *txn,
 #endif
 
 }
+
+/* Written by Shrinidhi */
 
 void ndmp_data_stop(struct client_txn *txn,
                                struct ndmp_header header, XDR* request_stream)
@@ -713,6 +728,8 @@ void ndmp_data_stop(struct client_txn *txn,
         printf("Data state: %d\n",session_info->data_state);
 #endif
 }
+
+/* Written by Shrinidhi */
 
 void ndmp_data_get_env(struct client_txn *txn,
                                struct ndmp_header header, XDR* request_stream)

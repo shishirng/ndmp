@@ -7,6 +7,12 @@
  * cases as published by the Free Software Foundation.
  */
 
+/*
+ * This file and its components written by Ajeet
+ * unless specified otherwise.
+ */
+
+
 #include <ndmp_msg.h>
 #include <ndmp.h>
 #include <time.h>
@@ -131,6 +137,8 @@ ndmp_message_handler ndmp_dispatch(int message) {
         }
 }
 
+/* Written by Shrinidhi */
+
 void ndmp_error_message(struct client_txn *txn, 
                         struct ndmp_header header, 
                         XDR* requeststream)
@@ -179,6 +187,7 @@ void ndmp_accept_notify(struct client_txn* txn, struct ndmp_header header, XDR* 
         xdr_ndmp_notify_connected_request(&reply_stream, &reply);
 }
 
+/* Written by Shrinidhi */
 
 int get_next_seq_number() {
 
@@ -186,6 +195,8 @@ int get_next_seq_number() {
 
         return sequence_number++;
 }
+
+/* Written by Shrinidhi */
 
 void set_header(ndmp_header req, ndmp_header *reply, ndmp_error err)
 {
@@ -198,6 +209,7 @@ void set_header(ndmp_header req, ndmp_header *reply, ndmp_error err)
         reply->error = err;
 } 
 
+/* Written by Shrinidhi */
 
 /*
  * get_session_queue can be called from
@@ -218,6 +230,8 @@ struct queue_hdr* get_session_queue()
 
         return session_info_queue;
 }
+
+/* Written by Shrinidhi */
 
 struct ndmp_session_info* get_session_info(int session_id) {
 
@@ -270,6 +284,8 @@ struct ndmp_session_info* get_session_info(int session_id) {
         return retval;
 }
 
+/* Written by Shrinidhi */
+
 int session_info_cmp (void *id, void *session) 
 {
         int session_id = *(int *) id;
@@ -278,6 +294,8 @@ int session_info_cmp (void *id, void *session)
         
         return session_id == queue_elem_session_id;
 }
+
+/* Written by Shrinidhi */
 
 /*
  * Each NDMP request (job) that is handled is added
@@ -292,6 +310,9 @@ void add_job_to_session(struct client_txn *txn)
         session = get_session_info(txn->client_session.session_id);
         enqueue(session->jobs, txn);
 }               
+
+/* Written by Shrinidhi */
+
 /*
  * Each session will have outstanding jobs held in 
  * a queue; one queue element for each request in 
@@ -329,10 +350,15 @@ int cleanup_session(struct client_txn *txn)
         return 0; /* session active */
 }
 
+/* Written by Shrinidhi */
+
 int job_cmp(void *target, void *elem) 
 {
         return target == elem;
 }
+
+
+/* Written by Shrinidhi */
 
 /*
  * terminate_session is called to indicate the
