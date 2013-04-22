@@ -7,6 +7,11 @@
  * cases as published by the Free Software Foundation.
  */
 
+/*
+ * This file and its functions written by Shrinidhi
+ * unless specified otherwise.
+ */
+
 #ifndef __H__NDMP_XDR__
 #define __H__NDMP_XDR__
 

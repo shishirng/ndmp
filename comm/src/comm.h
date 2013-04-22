@@ -7,6 +7,11 @@
  * cases as published by the Free Software Foundation.
  */
 
+/*
+ * This file and its components written by Shrinidhi
+ * unless otherwise specified.
+ */
+
 #ifndef __H__COMM__
 #define __H__COMM__
 

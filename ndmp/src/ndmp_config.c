@@ -7,6 +7,11 @@
  * cases as published by the Free Software Foundation.
  */
 
+/*
+ * This file and its functions written by Shrinidhi
+ * unless otherwise specified.
+ */
+
 #include <ndmp.h>
 #include <comm.h>
 #include <unistd.h>

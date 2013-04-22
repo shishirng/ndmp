@@ -4,7 +4,11 @@
  # General Public License, version 3 or any later version (LGPLv3 or
  # later), or the GNU General Public License, version 2 (GPLv2), in all
  # cases as published by the Free Software Foundation.
+
+ # This file and its components written by Shrinidhi
+ # unless otherwise specified. 
  
+
 CFLAGS = -I../  -g 
 CC = gcc
 

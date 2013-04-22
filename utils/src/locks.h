@@ -7,6 +7,11 @@
  * cases as published by the Free Software Foundation.
  */
 
+/*
+ * This file and its components written by Shrinidhi
+ * unless otherwise specified.
+ */
+
 #ifndef __H_LOCKS__
 #define __H_LOCKS__
 #include <pthread.h>

@@ -7,6 +7,11 @@
  * cases as published by the Free Software Foundation.
  */
 
+/*
+ * This file and its components written by Shrinidhi
+ * unless otherwise specified.
+ */
+
 #include "hexdump.h"
 
 void hexdump(void *buffer, unsigned int size)

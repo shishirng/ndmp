@@ -7,11 +7,16 @@
  * cases as published by the Free Software Foundation.
  */
 
+/*
+ * This file and its components written by Shrinidhi
+ * unless otherwise specified.
+ */
+
 #include <comm.h>
 #include <worker.h>
 
 /*
- *  comm_int: 
+ *  comm_context:
  *  Creates a comm_context structure
  *  which is the anchor structure that
  *  holds the session structures for all
@@ -35,7 +40,6 @@ struct comm_context* comm_context()
 }
 
 /*
- *
  *  create_listener
  *    creates a listener socket to listen on specified port and 
  *    returns the socket to the caller
@@ -61,7 +65,7 @@ int create_listener(int port) {
         retval = socket(AF_INET, SOCK_STREAM, 0);
 
         setsockopt(retval, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(int));
-        fcntl(retval, F_SETFL, O_NONBLOCK);
+       // fcntl(retval, F_SETFL, O_NONBLOCK);
         if (bind(retval, (struct sockaddr *) &listener,
                         sizeof(struct sockaddr_in)) == -1)
                 errExit("Error:bind");
