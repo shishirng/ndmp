@@ -35,6 +35,54 @@ void xdr_decode_encode(struct client_txn *txn)
          *  3. Enqueue the response into the response queue
          */
 
+        XDR request_stream, stream_len;
+        int message_type;
+        struct ndmp_header header;
+        char *buf, mesg_len[4];
+        int len;
+        struct comm_context *ctx = comm_context();
+        if (txn->request.is_tcp_connect == 1) {
+                header.message = 0xf001;
+        }
+        else {
+                xdrmem_create(&request_stream, txn->request.message+4, txn->request.length-4,
+                        XDR_DECODE);
+                /*
+                 * Read the ndmp header
+                 */
+
+                xdr_ndmp_header(&request_stream, &header);
+        }
+        /*
+         * Add job to session's job queue
+         */
+
+        add_job_to_session(txn);
+        ndmp_dispatch(header.message)(txn, header, &request_stream);
+        
+        if (cleanup_session(txn) == 1 || txn->reply.length == 0) {
+                free(txn); /* client terminated. Don't send response */
+        }
+        else {
+                /* 
+                 * It is possible that at this point in time
+                 * or later before the response is sent the client
+                 * terminates. comm layer needs to check again for
+                 * client termination, before sending the response
+                 */
+
+                buf = (char *)malloc(txn->reply.length+4);
+                memcpy(buf+4,txn->reply.message,txn->reply.length);
+                len = txn->reply.length | (1<<31);
+                xdrmem_create(&stream_len,mesg_len,4, XDR_ENCODE);
+                xdr_int(&stream_len, &len);
+                memcpy(buf,mesg_len,4);
+                memcpy(txn->reply.message, buf, txn->reply.length+4);
+                txn->reply.length +=4;
+                enqueue(ctx->reply_jobs, txn);
+                free(buf);
+        }
+
      
 }
 
@@ -102,6 +150,35 @@ void ndmp_error_message(struct client_txn *txn,
 
 void ndmp_accept_notify(struct client_txn* txn, struct ndmp_header header, XDR* request_stream) 
 {
+
+        struct ndmp_notify_connected_request reply;
+        struct ndmp_header reply_header;
+        XDR reply_stream;
+
+        reply.reason = NDMP_CONNECTED;
+        reply.protocol_version = 3;
+        reply.text_reason = "";
+        
+        reply_header.sequence = get_next_seq_number();
+        reply_header.time_stamp = (u_long) time(NULL);
+        reply_header.message_type = NDMP_MESSAGE_REQUEST;
+        reply_header.message = NDMP_NOTIFY_CONNECTED;
+        reply_header.reply_sequence = 0;
+        reply_header.error = NDMP_NO_ERR;
+
+        //set_header(header, &reply_header, NDMP_NO_ERR);
+        txn->reply.length = xdr_sizeof((xdrproc_t) 
+                                       xdr_ndmp_header,
+                                       &reply_header);
+        txn->reply.length += xdr_sizeof((xdrproc_t) 
+                                        xdr_ndmp_notify_connected_request,
+                                        &reply);
+        
+        xdrmem_create(&reply_stream, txn->reply.message, txn->reply.length,
+                      XDR_ENCODE);
+
+        xdr_ndmp_header(&reply_stream, &reply_header);
+        xdr_ndmp_notify_connected_request(&reply_stream, &reply);
         
 }
 
