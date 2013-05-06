@@ -252,12 +252,12 @@ void ndmp_data_start_backup(struct client_txn *txn,
                 data_env->env_val = (ndmp_pval*)malloc(8*sizeof(ndmp_pval) );
 
 
-                        for (i = 0; i < request.env.env_len; i++) {
-                                request.env.env_val[i].name = (char*) malloc(64*sizeof(char));
-                                request.env.env_val[i].value = (char*) malloc(64*sizeof(char));
-                                data_env->env_val[i].name = (char*) malloc(64*sizeof(char));
-                                data_env->env_val[i].value = (char*) malloc(64*sizeof(char));
-                        }
+                for (i = 0; i < request.env.env_len; i++) {
+                         request.env.env_val[i].name = (char*) malloc(64*sizeof(char));
+                         request.env.env_val[i].value = (char*) malloc(64*sizeof(char));
+                         data_env->env_val[i].name = (char*) malloc(64*sizeof(char));
+                         data_env->env_val[i].value = (char*) malloc(64*sizeof(char));
+                }
 
                 xdr_ndmp_data_start_backup_request(request_stream, &request);
                 enter_critical_section(session_info->s_lock);
@@ -283,12 +283,12 @@ void ndmp_data_start_backup(struct client_txn *txn,
                 ndmp_pval* env_val = request.env.env_val;
                 u_long env_len = request.env.env_len;
 
-                 data_env->env_len = request.env.env_len;
+                data_env->env_len = request.env.env_len;
 
-                        for (i = 0; i < env_len; i++){
-                                        strcpy(data_env->env_val[i].name,request.env.env_val[i].name);
-                                        strcpy(data_env->env_val[i].value,request.env.env_val[i].value);
-                        }
+                for (i = 0; i < env_len; i++){
+                        strcpy(data_env->env_val[i].name,request.env.env_val[i].name);
+                        strcpy(data_env->env_val[i].value,request.env.env_val[i].value);
+                }
 
                 char* name_buf;
                 char* val_buf;
@@ -333,9 +333,9 @@ void ndmp_data_start_backup(struct client_txn *txn,
 #ifdef DEBUG
 
                 if(temp_fp == NULL ) {
-			printf("couldn't open vol_usage file in backup function \n");
-			write_client_log(txn->client_session.client_info.client, "couldn't open vol_usage file in backup function");
-		}
+                        printf("couldn't open vol_usage file in backup function \n");
+                        write_client_log(txn->client_session.client_info.client, "couldn't open vol_usage file in backup function");
+                }
                 else printf("vol_usage file opened successfully :) \n");
 #endif  
         
@@ -348,14 +348,14 @@ void ndmp_data_start_backup(struct client_txn *txn,
                 
                 struct vol_fs_node * temp_node = find ( list_head , client_ip_fs  ) ;
                 if(  temp_node  != NULL ) {
-			write_client_log(txn->client_session.client_info.client, "Client info was found in the config file");
+                        write_client_log(txn->client_session.client_info.client, "Client info was found in the config file");
                         printf("Client info was found in the config file \nusing volume $ %s $ for backup\n", temp_node->vol_name);
                         strcpy(vol_name,temp_node->vol_name);
 
                 } 
                 else {
                         is_it_new = 1;
-			write_client_log(txn->client_session.client_info.client, "Client info was NOT found in the config file");
+                        write_client_log(txn->client_session.client_info.client, "Client info was NOT found in the config file");
                         printf("Client info was NOT found in the config file \nenter the volume to be used : ");
                         scanf("%s",vol_name);
                         char* temp_fs = (char*) malloc( ( strlen(client_ip) + strlen(client_path) +3 ) * sizeof(char));
@@ -417,7 +417,7 @@ void ndmp_data_start_backup(struct client_txn *txn,
                         strcat(mount_instr,mount_point);
 #ifdef DEBUG
                         printf("\nprinting mount instr $ %s \n",mount_instr);
-			write_client_log(txn->client_session.client_info.client,mount_instr);
+                        write_client_log(txn->client_session.client_info.client,mount_instr);
 #endif
 
                         int ret_mount_instr = system(mount_instr);
@@ -469,7 +469,7 @@ void ndmp_data_start_backup(struct client_txn *txn,
                 strcat(rsync_instr,backup_location);
 #ifdef DEBUG
                 printf("printing rsync instr $ %s \n",rsync_instr);
-		write_client_log(txn->client_session.client_info.client,rsync_instr);
+                write_client_log(txn->client_session.client_info.client,rsync_instr);
 #endif
                 int ret_rsync_instr = system(rsync_instr);
                 //printf("return value of rsync instr = %d \n", ret_rsync_instr);
@@ -601,59 +601,49 @@ void ndmp_data_start_recover(struct client_txn *txn,
 
                 }
 
-
-                
-                
-
-                // to be resolved later by making client's backup info and volume info as key value pair
                 char vol_name[20];
-                //scanf("%s",vol_name);
 
-		// extracting mount_point and vol_name
-		
-		                
+                // extracting mount_point and vol_name
                 FILE * temp_fp = fopen("gluster_vol_usage","a+");
 #ifdef DEBUG
 
                 if(temp_fp == NULL ) {
-			printf("couldn't open vol_usage file in backup function \n");
-			write_client_log(txn->client_session.client_info.client, "couldn't open vol_usage file in backup function");
-			}
+                        printf("couldn't open vol_usage file in backup function \n");
+                        write_client_log(txn->client_session.client_info.client, "couldn't open vol_usage file in backup function");
+                        }
 
                 else {
-			printf("vol_usage file opened successfully \n");
-			write_client_log(txn->client_session.client_info.client, "vol_usage file opened successfully");
+                        printf("vol_usage file opened successfully \n");
+                        write_client_log(txn->client_session.client_info.client, "vol_usage file opened successfully");
                 }
 #endif  
-        	char host_ip[20];
-		char bu_point[100];
+                char host_ip[20];
+                char bu_point[100];
                 fscanf(temp_fp,"%s %s",host_ip,bu_point );
-		
-        	char temp_vol_name[20];
-        	char temp_filesystem[100];
-       		char temp_user[30];
-		
-		char * ip_fs;
-		ip_fs = (char*) malloc( sizeof(char)* ( strlen ( client_ip ) + strlen ( client_path ) + 3) );
-		strcpy(ip_fs , client_ip);
-		strcat(ip_fs,client_path);
-		
-		while(fscanf(temp_fp,"%s %s %s",temp_vol_name,temp_filesystem,temp_user ) > 0 ){
-			if(strcmp(ip_fs , temp_filesystem  ) ==0 )
-				strcpy(vol_name,temp_vol_name);
+                
+                char temp_vol_name[20];
+                char temp_filesystem[100];
+                char temp_user[30];
+                
+                char * ip_fs;
+                ip_fs = (char*) malloc( sizeof(char)* ( strlen ( client_ip ) + strlen ( client_path ) + 3) );
+                strcpy(ip_fs , client_ip);
+                strcat(ip_fs,client_path);
+                
+                while(fscanf(temp_fp,"%s %s %s",temp_vol_name,temp_filesystem,temp_user ) > 0 ){
+                        if(strcmp(ip_fs , temp_filesystem  ) ==0 )
+                                strcpy(vol_name,temp_vol_name);
 
-			}
-		free(ip_fs);
+                        }
+                free(ip_fs);
                 fclose(temp_fp);
         
-		//addition ends
-
-		char *mount_point;
+                char *mount_point;
                  mount_point = (char*) realloc(mount_point,strlen(bu_point) + strlen(vol_name) + strlen(client_ip) + \
                                  strlen(client_path ) + strlen(request.nlist.nlist_val[0].original_path ) + 3);
-		strcpy(mount_point,bu_point);
-		strcat(mount_point,"/");                
-		strcat(mount_point,vol_name);
+                strcpy(mount_point,bu_point);
+                strcat(mount_point,"/");                
+                strcat(mount_point,vol_name);
                 strcat(mount_point,"/");
                 strcat(mount_point,client_ip);
                 strcat(mount_point,client_path);
@@ -675,7 +665,7 @@ void ndmp_data_start_recover(struct client_txn *txn,
                 strcat(rsync_instr, request.nlist.nlist_val[0].destination_dir);
 #ifdef DEBUG
                 printf("printing rsync instr $ %s \n",rsync_instr);
-		write_client_log(txn->client_session.client_info.client,rsync_instr);
+                write_client_log(txn->client_session.client_info.client,rsync_instr);
 #endif
                 int ret_rsync_instr = system(rsync_instr);
 
