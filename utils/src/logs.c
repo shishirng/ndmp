@@ -1,8 +1,10 @@
 /*
- * logs.c
- *
- *  Created on: Apr 23, 2013
- *      Author: test
+ * Copyright (c) 2008-2012 Red Hat, Inc. http://www.redhat.com
+ * This file is part of glfs-ndmp.
+ * This file is licensed to you under your choice of the GNU Lesser
+ * General Public License, version 3 or any later version (LGPLv3 or
+ * later), or the GNU General Public License, version 2 (GPLv2), in all
+ * cases as published by the Free Software Foundation.
  */
 
 #include <logs.h>
@@ -21,6 +23,8 @@ void get_timestamp(char timebuf[])
 	strcpy(timebuf, buf);
 }
 
+/*For logging to work properly please ensure the ndmp server is placed in / */
+
 void write_client_log(struct sockaddr_in socket, char* message)
 {
 	char log_file_name[64];
@@ -29,7 +33,7 @@ void write_client_log(struct sockaddr_in socket, char* message)
 	char timestamp[64];
 	char filename[64];
 
-	log_file_len = sprintf(log_file_name, "/home/test/Project/repo/ndmp/log/%s.txt", inet_ntoa(socket.sin_addr));
+	log_file_len = sprintf(log_file_name, "/ndmp_server/log/%s.txt", inet_ntoa(socket.sin_addr));
 	log_fd = open(log_file_name, O_WRONLY | O_CREAT | O_APPEND);
 
 	get_timestamp(timestamp);
@@ -54,7 +58,7 @@ void write_server_log(char* message)
 	int log_file_len, write_buf_len, log_fd;
 	char timestamp[64];
 
-	log_file_len = sprintf(log_file_name, "/home/test/Project/repo/ndmp/log/server.txt");
+	log_file_len = sprintf(log_file_name, "/ndmp_server/log/server.txt");
 	log_fd = open(log_file_name, O_WRONLY | O_CREAT | O_APPEND);
 
 	get_timestamp(timestamp);

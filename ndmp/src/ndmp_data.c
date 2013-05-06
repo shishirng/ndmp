@@ -214,258 +214,291 @@ void ndmp_data_connect(struct client_txn *txn, struct ndmp_header header, XDR* r
         exit_critical_section(session_info->s_lock);
 }
 
+
 void ndmp_data_start_backup(struct client_txn *txn,
                                struct ndmp_header header, XDR* request_stream)
 {
           /* struct ndmp_data_start_backup_request
-           * {
-           *        string          bu_type<>;
-           *        ndmp_pval       env<>;
-           * };
-           *
-           * struct ndmp_data_start_backup_reply
-           * {
-           *        ndmp_error      error;
-           * };
-           *
-           */
+                 * {
+                 *        string          bu_type<>;
+                 *        ndmp_pval       env<>;
+                 * };
+                 *
+                 * struct ndmp_data_start_backup_reply
+                 * {
+                 *        ndmp_error      error;
+                 * };
+                 *
+                 */
 
-        static bool mount_done = FALSE ;
-        struct ndmp_data_start_backup_request request;
-        struct ndmp_header reply_header;
-        struct ndmp_data_start_backup_reply reply;
-        struct ndmp_session_info *session_info;
-        XDR reply_stream;
-        struct environment *data_env = get_environment();
-        session_info = get_session_info(txn->client_session.session_id);
-        int i;
+                //static bool mount_done = FALSE ;
+                struct ndmp_data_start_backup_request request;
+                struct ndmp_header reply_header;
+                struct ndmp_data_start_backup_reply reply;
+                struct ndmp_session_info *session_info;
+                XDR reply_stream;
+                struct environment *data_env = get_environment();
+                session_info = get_session_info(txn->client_session.session_id);
+                int i;
 
-        /* We assume that the backup type and env key-value pairs have a
-         * maximum length of 8 characters, and that the keys and values
-         * themselves have a maximum length of 64 characters.
-         */
+                /* We assume that the backup type and env key-value pairs have a
+                 * maximum length of 8 characters, and that the keys and values
+                 * themselves have a maximum length of 64 characters.
+                 */
 
-        write_client_log(txn->client_session.client_info.client, "Backup operation commencing");
+                request.bu_type = (char*) malloc(8*sizeof(char));
+                request.env.env_len = 8;
+                request.env.env_val = (ndmp_pval*)malloc(8*sizeof(ndmp_pval) );
+                data_env->env_val = (ndmp_pval*)malloc(8*sizeof(ndmp_pval) );
 
-        request.bu_type = (char*) malloc(8*sizeof(char));
-        request.env.env_len = 8;
-        request.env.env_val = (ndmp_pval*)malloc(8*sizeof(ndmp_pval) );
-        data_env->env_val = (ndmp_pval*)malloc(8*sizeof(ndmp_pval) );
 
-        for (i = 0; i < request.env.env_len; i++) {
-                request.env.env_val[i].name = (char*) malloc(64*sizeof(char));
-                request.env.env_val[i].value = (char*) malloc(64*sizeof(char));
-                data_env->env_val[i].name = (char*) malloc(64*sizeof(char));
-                data_env->env_val[i].value = (char*) malloc(64*sizeof(char));
-        }
+                        for (i = 0; i < request.env.env_len; i++) {
+                                request.env.env_val[i].name = (char*) malloc(64*sizeof(char));
+                                request.env.env_val[i].value = (char*) malloc(64*sizeof(char));
+                                data_env->env_val[i].name = (char*) malloc(64*sizeof(char));
+                                data_env->env_val[i].value = (char*) malloc(64*sizeof(char));
+                        }
 
-        xdr_ndmp_data_start_backup_request(request_stream, &request);
-        enter_critical_section(session_info->s_lock);
-        reply.error = NDMP_NO_ERR;
+                xdr_ndmp_data_start_backup_request(request_stream, &request);
+                enter_critical_section(session_info->s_lock);
+                reply.error = NDMP_NO_ERR;
 
-        // checking state
-        if(session_info -> data_state != NDMP_DATA_STATE_CONNECTED){
-                reply.error = NDMP_ILLEGAL_STATE_ERR;
-                write_client_log(txn->client_session.client_info.client, "Illegal state");
-
-        }
-        else {
-             //changing state
-                session_info->data_state = NDMP_DATA_STATE_ACTIVE;
-                write_client_log(txn->client_session.client_info.client, "Changed state to active");
-        }
-
-        char full_ip[30]="";
-        strcpy(full_ip,inet_ntoa(txn->client_session.client_info.client.sin_addr));
-
-        write_client_log(txn->client_session.client_info.client, "Obtained client IP");
-
-#ifdef DEBUG
-        printf("Butype : %s \n",request.bu_type );
-        printf("ENV variables \n");
-#endif
-
-        ndmp_pval* env_val = request.env.env_val;
-        u_long env_len = request.env.env_len;
-
-        data_env->env_len = request.env.env_len;
-
-        for (i = 0; i < env_len; i++){
-                strcpy(data_env->env_val[i].name,request.env.env_val[i].name);
-                strcpy(data_env->env_val[i].value,request.env.env_val[i].value);
-        }
-
-        write_client_log(txn->client_session.client_info.client, "Obtained all environment variables");
-
-        char* name_buf;
-        char* val_buf;
-
-        char *client_path;
-        char *user_name;
-
-        for( i=0;i<env_len ; i++){
-                name_buf = (char*)malloc(strlen(env_val[i].name)+1);
-                val_buf = (char*)malloc(strlen(env_val[i].value)+1);
-                strcpy(name_buf,env_val[i].name);
-                strcpy(val_buf,env_val[i].value);
-
-#ifdef DEBUG
-                printf("\nname : %s \nvalue : %s \n\n",name_buf,val_buf);
-#endif
-
-                if(strcmp(env_val[i].name,"FILESYSTEM") ==0 ) {
-                	client_path = (char*) malloc (strlen(env_val[i].value) +1 );
-                	strcpy(client_path,env_val[i].value);
+                // checking state
+                if(session_info -> data_state != NDMP_DATA_STATE_CONNECTED){
+                        reply.error = NDMP_ILLEGAL_STATE_ERR;
+                }
+                else {
+                        //changing state
+                        session_info->data_state = NDMP_DATA_STATE_ACTIVE;
                 }
 
-                if(strcmp(env_val[i].name,"USER")==0){
-                	user_name = (char*) malloc (strlen( env_val[i].value ) +1 );
-                	strcpy(user_name,env_val[i].value);
-                }
-        }
-
-        // get volume name, assuming volume name less than 20
-        char vol_name[20];
-        printf("enter the volume name : ");
-        scanf("%s",vol_name );
-
-        write_client_log(txn->client_session.client_info.client, "Obtained volume name");
-        char *mount_point;
-        mount_point = (char*) malloc(16 * sizeof(char));
-        strcpy(mount_point,"/mnt/backedup2/");
-
-        mount_point = (char*) realloc(mount_point,strlen(mount_point) + strlen(vol_name) + 3);
-        strcat(mount_point,vol_name);
-
-        write_client_log(txn->client_session.client_info.client, "Obtained mount point");
-
-        char * dir_inst_1;
-        dir_inst_1 = (char*) malloc (11 * sizeof(char));
-        strcpy(dir_inst_1,"mkdir -p ");
-        dir_inst_1 = (char*) realloc( dir_inst_1, strlen(dir_inst_1)+strlen(mount_point) );;
-        strcat(dir_inst_1,mount_point);
-
-        printf("creating directory for volume mount $ %s ",dir_inst_1);
-        system(dir_inst_1);
-        write_client_log(txn->client_session.client_info.client, "Creating directory for volume mount");
-
-        // mount_point does not end with '/'
-        char *mount_instr;
-        mount_instr=(char*) malloc( 21 * sizeof(char ) );
-        strcpy(mount_instr,"mount -t glusterfs ");
-        mount_instr = (char*) realloc( mount_instr ,strlen(mount_instr) + 17+ strlen(vol_name) + strlen(mount_point));
-        char host_ip[20];
-
-        FILE* fp;
-        fp = popen("ip addr show scope global | grep inet | cut -d' ' -f6 | cut -d/ -f1","r");
-        char ip[30];
-        fscanf(fp,"%s",host_ip);
-        pclose(fp);
-        strcat(mount_instr,host_ip);
-        strcat(mount_instr,":/");
-        strcat(mount_instr,vol_name);
-        strcat(mount_instr," ");
-        strcat(mount_instr,mount_point);
-
-        write_client_log(txn->client_session.client_info.client, "Created mount instruction");
+                char client_ip[30]="";
+                strcpy(client_ip,inet_ntoa(txn->client_session.client_info.client.sin_addr));
 
 #ifdef DEBUG
-        printf("\nprinting mount instr $ %s \n",mount_instr);
+                printf("Butype : %s \n",request.bu_type );
+                printf("ENV variables \n");
 #endif
 
-        if(mount_done == FALSE ){
+                ndmp_pval* env_val = request.env.env_val;
+                u_long env_len = request.env.env_len;
 
-        	int ret_mount_instr = system(mount_instr);
+                 data_env->env_len = request.env.env_len;
 
-                if(ret_mount_instr  != 0){
-                        printf("failed : mount volume \n");
+                        for (i = 0; i < env_len; i++){
+                                        strcpy(data_env->env_val[i].name,request.env.env_val[i].name);
+                                        strcpy(data_env->env_val[i].value,request.env.env_val[i].value);
+                        }
+
+                char* name_buf;
+                char* val_buf;
+
+                char *client_path;
+                char *user_name;
+
+                for( i=0;i<env_len ; i++){
+                        name_buf = (char*)malloc(strlen(env_val[i].name)+1);
+                        val_buf = (char*)malloc(strlen(env_val[i].value)+1);
+                        strcpy(name_buf,env_val[i].name);
+                        strcpy(val_buf,env_val[i].value);
+#ifdef DEBUG
+                        printf("\nname : %s \nvalue : %s \n\n",name_buf,val_buf);
+#endif
+                        if(strcmp(env_val[i].name,"FILESYSTEM") ==0 ) {
+                                client_path = (char*) malloc (strlen(env_val[i].value) +1 );
+                                strcpy(client_path,env_val[i].value);
+                        }
+                        if(strcmp(env_val[i].name,"USER")==0){
+                                user_name = (char*) malloc (strlen( env_val[i].value ) +1 );
+                                strcpy(user_name,env_val[i].value);
+                        }
+
+
+                }
+                
+                struct vol_fs_node * list_head = NULL;
+                int head_init ;
+                head_init = init_vol_fs_list(&list_head ,"gluster_vol_usage") ;
+
+                // synchronising with config file
+                
+                char host_ip[20];
+                char vol_name[20];
+                char bu_point[200];
+                int is_it_new = 0;
+
+                set_host_config("gluster_vol_usage");
+                
+                FILE * temp_fp = fopen("gluster_vol_usage","a+");
+#ifdef DEBUG
+
+                if(temp_fp == NULL ) {
+			printf("couldn't open vol_usage file in backup function \n");
+			write_client_log(txn->client_session.client_info.client, "couldn't open vol_usage file in backup function");
+		}
+                else printf("vol_usage file opened successfully :) \n");
+#endif  
+        
+                fscanf(temp_fp,"%s %s",host_ip,bu_point );
+                fclose(temp_fp);
+                        
+                char* client_ip_fs = (char*)malloc( ( strlen(client_ip) +1 + strlen(client_path) +1 ) * sizeof(char) );
+                strcpy(client_ip_fs,client_ip);
+                strcat(client_ip_fs,client_path);
+                
+                struct vol_fs_node * temp_node = find ( list_head , client_ip_fs  ) ;
+                if(  temp_node  != NULL ) {
+			write_client_log(txn->client_session.client_info.client, "Client info was found in the config file");
+                        printf("Client info was found in the config file \nusing volume $ %s $ for backup\n", temp_node->vol_name);
+                        strcpy(vol_name,temp_node->vol_name);
+
+                } 
+                else {
+                        is_it_new = 1;
+			write_client_log(txn->client_session.client_info.client, "Client info was NOT found in the config file");
+                        printf("Client info was NOT found in the config file \nenter the volume to be used : ");
+                        scanf("%s",vol_name);
+                        char* temp_fs = (char*) malloc( ( strlen(client_ip) + strlen(client_path) +3 ) * sizeof(char));
+                        strcpy(temp_fs,client_ip);
+                        strcat(temp_fs,client_path);
+                        printf("updating the config file \n");
+                        FILE * temp_fp = fopen("gluster_vol_usage","a+");
+                        fprintf(temp_fp,"%s %s %s\n",vol_name,temp_fs, user_name);
+                        fclose(temp_fp);
+                        free(temp_fs);
+
+                }
+                
+               char* mount_point;
+               mount_point = (char*) malloc((strlen(bu_point) +1 ) * sizeof(char));
+               strcpy(mount_point,bu_point);
+                
+
+                // get mount_point using config file
+                
+                mount_point = (char*) realloc(mount_point,strlen(mount_point) + strlen(vol_name) + 3);
+                strcat(mount_point,"/");
+                strcat(mount_point,vol_name);
+
+                
+                /* *** creation of directory and mounting of volume not required ***
+                
+                char * dir_inst_1;
+                dir_inst_1 = (char*) malloc (11 * sizeof(char));
+                strcpy(dir_inst_1,"mkdir -p ");
+                dir_inst_1 = (char*) realloc( dir_inst_1, strlen(dir_inst_1)+strlen(mount_point) );;
+                strcat(dir_inst_1,mount_point);
+                
+                printf("creating directory for volume mount $ %s ",dir_inst_1);
+                system(dir_inst_1);
+                
+                */
+                // backup_point does not end with '/'
+                if(is_it_new){
+                        char *mount_instr;
+                        mount_instr=(char*) malloc( 21 * sizeof(char ) );
+                        strcpy(mount_instr,"mount -t glusterfs ");
+                        mount_instr = (char*) realloc( mount_instr ,strlen(mount_instr) + 17+ strlen(vol_name) + strlen(mount_point));
+                
+                
+                        /* do not need
+                        FILE* fp;
+                        fp=popen("ip addr show scope global | grep inet | cut -d' ' -f6 | cut -d/ -f1","r");
+                        char ip[30];
+                        fscanf(fp,"%s",host_ip);
+                        pclose(fp);
+        
+                        */
+                        
+                        strcat(mount_instr,host_ip);
+                        strcat(mount_instr,":/");
+                        strcat(mount_instr,vol_name);
+                        strcat(mount_instr," ");
+                        strcat(mount_instr,mount_point);
+#ifdef DEBUG
+                        printf("\nprinting mount instr $ %s \n",mount_instr);
+			write_client_log(txn->client_session.client_info.client,mount_instr);
+#endif
+
+                        int ret_mount_instr = system(mount_instr);
+
+                        if(ret_mount_instr  != 0){
+                                printf("failed : mount volume \n");
+                                reply.error = NDMP_ILLEGAL_STATE_ERR;
+                                session_info->data_state = NDMP_DATA_STATE_HALTED;
+                                goto SEND ;
+                        }
+
+                }
+        
+                char* backup_location;
+
+                backup_location = (char*) malloc (strlen(mount_point) + strlen(client_ip) + strlen(client_path) +3 );
+                
+                strcpy(backup_location,mount_point);            
+                strcat(backup_location,"/");
+                strcat(backup_location ,client_ip);
+                strcat(backup_location ,client_path);
+
+                char *dir_instr;
+                dir_instr = (char*) malloc( 11 * sizeof(char));
+                strcpy(dir_instr,"mkdir -p ");
+                dir_instr = (char*) realloc(dir_instr,strlen(dir_instr) + strlen(backup_location)+1);
+                strcat(dir_instr,backup_location);
+
+
+                int ret_dir_instr = system(dir_instr);
+
+
+                if(ret_dir_instr != 0){
+                       printf("mount point directory creation failed or already exists \n");
+                }
+
+                
+                char *rsync_instr;
+                rsync_instr = (char*) malloc ( 12 * sizeof(char ));
+                strcpy(rsync_instr,"rsync -av ");
+                rsync_instr = (char*) realloc(rsync_instr,strlen(rsync_instr) + 6 + strlen(user_name) +\
+                                strlen(client_ip)+strlen(client_path) + strlen(backup_location) );
+                strcat(rsync_instr,user_name);
+                strcat(rsync_instr,"@");
+                strcat(rsync_instr,client_ip);
+                strcat(rsync_instr,":");
+                strcat(rsync_instr, client_path);
+                strcat(rsync_instr,"/ ");
+                strcat(rsync_instr,backup_location);
+#ifdef DEBUG
+                printf("printing rsync instr $ %s \n",rsync_instr);
+		write_client_log(txn->client_session.client_info.client,rsync_instr);
+#endif
+                int ret_rsync_instr = system(rsync_instr);
+                //printf("return value of rsync instr = %d \n", ret_rsync_instr);
+
+                if(ret_rsync_instr != 0){
+                        // return after replying with proper error code tot the client
+                        printf("failed : rsync \n");
                         reply.error = NDMP_ILLEGAL_STATE_ERR;
                         session_info->data_state = NDMP_DATA_STATE_HALTED;
                         goto SEND ;
                 }
 
-                mount_done = TRUE;
-        }
 
-        write_client_log(txn->client_session.client_info.client, "Mount successful");
+        SEND:   set_header(header, &reply_header, reply.error);
+                txn->reply.length = xdr_sizeof((xdrproc_t) xdr_ndmp_header, &reply_header);
+                txn->reply.length += xdr_sizeof((xdrproc_t)xdr_ndmp_data_start_backup_reply, &reply);
 
-        char* backup_location;
+                xdrmem_create(&reply_stream, txn->reply.message, txn->reply.length,XDR_ENCODE);
+                xdr_ndmp_header(&reply_stream, &reply_header);
+                if (reply.error == NDMP_NO_ERR)
+                        xdr_ndmp_data_start_backup_reply(&reply_stream, &reply);
+                else
+                        txn->reply.length -= xdr_sizeof((xdrproc_t) xdr_ndmp_data_start_backup_reply, &reply);
 
-        backup_location = (char*) malloc (strlen(mount_point) + strlen(full_ip) + strlen(client_path) +3 );
-
-        strcat(backup_location,mount_point);
-        strcat(backup_location,"/");
-        strcat(backup_location ,full_ip);
-        strcat(backup_location ,client_path);
-
-        char *dir_instr;
-        dir_instr = (char*) malloc( 11 * sizeof(char));
-        strcpy(dir_instr,"mkdir -p ");
-        dir_instr = (char*) realloc(dir_instr,strlen(dir_instr) + strlen(backup_location)+1);
-        strcat(dir_instr,backup_location);
-
-        int ret_dir_instr = system(dir_instr);
-
-        if(ret_dir_instr != 0){
-                printf("mount point directory creation failed or already exists \n");
-        }
-
-        write_client_log(txn->client_session.client_info.client, "Created mount point directory");
-
-        char *rsync_instr;
-        rsync_instr = (char*) malloc ( 12 * sizeof(char ));
-        strcpy(rsync_instr,"rsync -av ");
-        rsync_instr = (char*) realloc(rsync_instr,strlen(rsync_instr) + 6 + strlen(user_name) +\
-        strlen(full_ip) + strlen(client_path) + strlen(backup_location) );
-        strcat(rsync_instr,user_name);
-        strcat(rsync_instr,"@");
-        strcat(rsync_instr,full_ip);
-        strcat(rsync_instr,":");
-        strcat(rsync_instr, client_path);
-        strcat(rsync_instr,"/ ");
-        strcat(rsync_instr,backup_location);
-
-        write_client_log(txn->client_session.client_info.client, "Created rsync instruction");
-
-
-#ifdef DEBUG
-         printf("printing rsync instr $ %s \n",rsync_instr);
-#endif
-
-        int ret_rsync_instr = system(rsync_instr);
-
-         //printf("return value of rsync instr = %d \n", ret_rsync_instr);
-
-        if(ret_rsync_instr != 0){
-                // return after replying with proper error code tot the client
-                printf("failed : rsync \n");
-                reply.error = NDMP_ILLEGAL_STATE_ERR;
                 session_info->data_state = NDMP_DATA_STATE_HALTED;
-                goto SEND ;
-        }
 
-        write_client_log(txn->client_session.client_info.client, "Data transfer complete");
-
-
-SEND:   set_header(header, &reply_header, reply.error);
-        txn->reply.length = xdr_sizeof((xdrproc_t) xdr_ndmp_header, &reply_header);
-        txn->reply.length += xdr_sizeof((xdrproc_t)xdr_ndmp_data_start_backup_reply, &reply);
-
-        xdrmem_create(&reply_stream, txn->reply.message, txn->reply.length,XDR_ENCODE);
-        xdr_ndmp_header(&reply_stream, &reply_header);
-
-        if (reply.error == NDMP_NO_ERR) {
-                xdr_ndmp_data_start_backup_reply(&reply_stream, &reply);
-                write_client_log(txn->client_session.client_info.client, "Backup complete");
-
-        }
-        else
-                txn->reply.length -= xdr_sizeof((xdrproc_t) xdr_ndmp_data_start_backup_reply, &reply);
-
-        session_info->data_state = NDMP_DATA_STATE_HALTED;
-
-        exit_critical_section(session_info->s_lock);
+                exit_critical_section(session_info->s_lock);
 }
+
 
 void ndmp_data_start_recover(struct client_txn *txn,
                                struct ndmp_header header, XDR* request_stream)
@@ -506,8 +539,6 @@ void ndmp_data_start_recover(struct client_txn *txn,
                  * themselves have a maximum length of 64 characters.
                  */
 
-                write_client_log(txn->client_session.client_info.client, "Recovery process commencing");
-
                 request.bu_type = (char*) malloc(8*sizeof(char));
                 request.env.env_len = 8;
                 request.env.env_val = (ndmp_pval*)malloc(8*sizeof(ndmp_pval) );
@@ -533,20 +564,14 @@ void ndmp_data_start_recover(struct client_txn *txn,
 
                 if(session_info -> data_state != NDMP_DATA_STATE_CONNECTED){
                         reply.error = NDMP_ILLEGAL_STATE_ERR;
-                        write_client_log(txn->client_session.client_info.client, "Illegal state");
-
                 }
                 else {
                         //changing state
                         session_info->data_state = NDMP_DATA_STATE_ACTIVE;
-                        write_client_log(txn->client_session.client_info.client, "Changed state to active");
-
                 }
 
-                char full_ip[20]="";
-                strcpy(full_ip,inet_ntoa(txn->client_session.client_info.client.sin_addr));
-
-                write_client_log(txn->client_session.client_info.client, "Obtained full IP");
+                char client_ip[20]="";
+                strcpy(client_ip,inet_ntoa(txn->client_session.client_info.client.sin_addr));
 
                 ndmp_pval* env_val = request.env.env_val;
                 u_long env_len = request.env.env_len;
@@ -577,49 +602,83 @@ void ndmp_data_start_recover(struct client_txn *txn,
                 }
 
 
-                char *mount_point;
-                mount_point = (char*) malloc(16*sizeof(char) );
-                strcpy(mount_point,"/mnt/backedup2/");
-
+                
+                
 
                 // to be resolved later by making client's backup info and volume info as key value pair
-                printf("give the volume name used for backup : ");
                 char vol_name[20];
-                scanf("%s",vol_name);
+                //scanf("%s",vol_name);
 
-                write_client_log(txn->client_session.client_info.client, "Obtained volume name");
+		// extracting mount_point and vol_name
+		
+		                
+                FILE * temp_fp = fopen("gluster_vol_usage","a+");
+#ifdef DEBUG
 
-                 mount_point = (char*) realloc(mount_point,strlen(mount_point) + strlen(vol_name) + strlen(full_ip) + \
-                                 strlen(client_path ) + strlen(request.nlist.nlist_val[0].original_path ) + 2);
-                strcat(mount_point,vol_name);
+                if(temp_fp == NULL ) {
+			printf("couldn't open vol_usage file in backup function \n");
+			write_client_log(txn->client_session.client_info.client, "couldn't open vol_usage file in backup function");
+			}
+
+                else {
+			printf("vol_usage file opened successfully \n");
+			write_client_log(txn->client_session.client_info.client, "vol_usage file opened successfully");
+                }
+#endif  
+        	char host_ip[20];
+		char bu_point[100];
+                fscanf(temp_fp,"%s %s",host_ip,bu_point );
+		
+        	char temp_vol_name[20];
+        	char temp_filesystem[100];
+       		char temp_user[30];
+		
+		char * ip_fs;
+		ip_fs = (char*) malloc( sizeof(char)* ( strlen ( client_ip ) + strlen ( client_path ) + 3) );
+		strcpy(ip_fs , client_ip);
+		strcat(ip_fs,client_path);
+		
+		while(fscanf(temp_fp,"%s %s %s",temp_vol_name,temp_filesystem,temp_user ) > 0 ){
+			if(strcmp(ip_fs , temp_filesystem  ) ==0 )
+				strcpy(vol_name,temp_vol_name);
+
+			}
+		free(ip_fs);
+                fclose(temp_fp);
+        
+		//addition ends
+
+		char *mount_point;
+                 mount_point = (char*) realloc(mount_point,strlen(bu_point) + strlen(vol_name) + strlen(client_ip) + \
+                                 strlen(client_path ) + strlen(request.nlist.nlist_val[0].original_path ) + 3);
+		strcpy(mount_point,bu_point);
+		strcat(mount_point,"/");                
+		strcat(mount_point,vol_name);
                 strcat(mount_point,"/");
-                strcat(mount_point,full_ip);
+                strcat(mount_point,client_ip);
                 strcat(mount_point,client_path);
                 // assumes the the orignal path always starts with "/"
                 strcat(mount_point,request.nlist.nlist_val[0].original_path);
 
-                write_client_log(txn->client_session.client_info.client, "Created mount point");
-
                 char *rsync_instr;
                 rsync_instr = (char*) malloc( 13 * sizeof(char));
                 strcpy(rsync_instr,"rsync -av ");
-                rsync_instr = (char*)realloc(rsync_instr ,strlen(rsync_instr) +  7 + strlen(mount_point)+strlen(user_name) + strlen(full_ip) \
+                rsync_instr = (char*)realloc(rsync_instr ,strlen(rsync_instr) +  7 + strlen(mount_point)+strlen(user_name) + strlen(client_ip) \
                                 + strlen(request.nlist.nlist_val[0].destination_dir ) ) ;
                 strcat(rsync_instr,mount_point);
-                strcat(rsync_instr," ");
+                strcat(rsync_instr," "); 
 
                 strcat(rsync_instr,user_name);
                 strcat(rsync_instr,"@");
-                strcat(rsync_instr,full_ip);
+                strcat(rsync_instr,client_ip);
                 strcat(rsync_instr,":");
                 strcat(rsync_instr, request.nlist.nlist_val[0].destination_dir);
-
-                write_client_log(txn->client_session.client_info.client, "Created rsync instruction");
-
 #ifdef DEBUG
                 printf("printing rsync instr $ %s \n",rsync_instr);
+		write_client_log(txn->client_session.client_info.client,rsync_instr);
 #endif
                 int ret_rsync_instr = system(rsync_instr);
+
 
                 if( ret_rsync_instr != 0){
 
@@ -630,7 +689,7 @@ void ndmp_data_start_recover(struct client_txn *txn,
                         goto SEND ;
                 }
 
-                write_client_log(txn->client_session.client_info.client, "Recovery data transfer successful");
+
 
          SEND : set_header(header, &reply_header, reply.error);
                 txn->reply.length = xdr_sizeof((xdrproc_t) xdr_ndmp_header, &reply_header);
@@ -638,10 +697,8 @@ void ndmp_data_start_recover(struct client_txn *txn,
 
                 xdrmem_create(&reply_stream, txn->reply.message, txn->reply.length,XDR_ENCODE);
                 xdr_ndmp_header(&reply_stream, &reply_header);
-                if (reply.error == NDMP_NO_ERR){
+                if (reply.error == NDMP_NO_ERR)
                         xdr_ndmp_data_start_recover_reply(&reply_stream, &reply);
-                        write_client_log(txn->client_session.client_info.client, "Recover complete");
-                }
                 else
                         txn->reply.length -= xdr_sizeof((xdrproc_t) xdr_ndmp_data_start_recover_reply, &reply);
 
@@ -650,6 +707,7 @@ void ndmp_data_start_recover(struct client_txn *txn,
 
                 exit_critical_section(session_info->s_lock);
 }
+
 
 void ndmp_data_abort(struct client_txn *txn,
                                struct ndmp_header header, XDR* request_stream)

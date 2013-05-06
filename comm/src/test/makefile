@@ -14,8 +14,8 @@ CFLAGS = -g -I ../ -I../../../utils/src
 
 all: comm 
 
-comm:	testcomm.o comm.o queue.o locks.o worker.o hexdump.o logs.o
-	gcc -o testcomm -g testcomm.o comm.o  queue.o locks.o worker.o hexdump.o logs.o -lpthread
+comm:	testcomm.o comm.o queue.o vol_info.o locks.o worker.o hexdump.o logs.o
+	gcc -o testcomm -g testcomm.o comm.o  queue.o vol_info.o locks.o worker.o hexdump.o logs.o -lpthread
 
 testcomm.o : testcomm.c ../comm.h
 	gcc -c $(CFLAGS) testcomm.c
@@ -31,6 +31,11 @@ hexdump.o: ../../../utils/src/queue.h ../../../utils/src/queue.c
 
 queue.o: ../../../utils/src/queue.h  ../../../utils/src/queue.c
 	gcc -c $(CFLAGS) ../../../utils/src/queue.c
+
+
+vol_info.o: ../../../utils/src/vol_info.h  ../../../utils/src/vol_info.c
+	gcc -c $(CFLAGS) ../../../utils/src/vol_info.c
+
 
 locks.o: ../../../utils/src/locks.h  ../../../utils/src/locks.c
 	gcc -c $(CFLAGS) ../../../utils/src/locks.c

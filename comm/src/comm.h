@@ -21,6 +21,7 @@
 
 #include <queue.h>
 #include <logs.h>
+#include <vol_info.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>

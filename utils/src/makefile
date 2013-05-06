@@ -9,11 +9,14 @@
  # unless otherwise specified. 
 
 CFLAGS = -g -I  .
-all: queue.o  locks.o hexdump.o logs.o
+all: vol_info.o queue.o  locks.o hexdump.o logs.o
 	(cd test; make)
 
 queue.o: queue.h queue.c locks.c
 	gcc $(CFLAGS) -c queue.c
+
+vol_info.o: vol_info.h vol_info.c
+	gcc $(CFLAGS) -c vol_info.c
 
 locks.o: locks.h locks.c
 	gcc $(CFLAGS) -c locks.c

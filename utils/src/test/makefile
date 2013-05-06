@@ -17,6 +17,7 @@ all: testq testhexdump
 testq: ../queue.h testq.c mtestq.c ../queue.c ../locks.c
 	$(CC) -c $(CFLAGS) ../queue.c
 	$(CC) -c $(CFLAGS) ../locks.c
+	$(CC) -c $(CFLAGS) ../vol_info.c
 	$(CC) -c $(CFLAGS) testq.c 
 	$(CC) -c $(CFLAGS) mtestq.c 
 	$(CC) -g -o  testq testq.o queue.o locks.o
