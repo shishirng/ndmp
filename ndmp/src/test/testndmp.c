@@ -12,6 +12,9 @@
 #include <stdio.h>
 #include <ndmp_msg.h>
 
+
+
+
 main()
 {
 	struct comm_context *ctx = comm_context();

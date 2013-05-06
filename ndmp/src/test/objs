@@ -7,3 +7,4 @@
 ./utils/src/locks.o
 ./utils/src/hexdump.o
 ./utils/src/queue.o
+./utils/src/logs.o

@@ -20,6 +20,7 @@
 #include <ndmp.h>
 #include <locks.h>
 #include <queue.h>
+#include <logs.h>
 
 enum ndmp_state {IDLE, LISTEN, CONNECTED, ACTIVE, HALTED};
 struct ndmp_session_info {

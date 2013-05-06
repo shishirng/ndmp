@@ -20,6 +20,7 @@
 #define MAX_MESSAGE_SIZE 2048
 
 #include <queue.h>
+#include <logs.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -28,10 +29,10 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <stdio.h>
-
+#include <time.h>
 
 struct client_endpoint {
-        struct sockaddr_in client;      
+        struct sockaddr_in client;
         int fd;
 };
 
@@ -55,6 +56,7 @@ struct client_txn {
 typedef void (*message_handler) (struct client_txn *);
 typedef int (*session_callback)(struct client_txn  *); 
 typedef void (*session_close)(int session_id);
+
 struct comm_context {
         message_handler marshal_unmarshal;
         session_callback cleanup_session;

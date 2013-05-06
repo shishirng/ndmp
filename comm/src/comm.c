@@ -14,6 +14,9 @@
 
 #include <comm.h>
 #include <worker.h>
+#include <logs.h>
+#include <signal.h>
+#include <unistd.h>
 
 /*
  *  comm_context:
@@ -26,6 +29,15 @@
 int session_comparator(void *target, void *elem);
 void handle_client_requests(fd_set *read_socks, struct comm_context *ctx);
 void handle_a_client_request(int fd, struct comm_context *ctx);
+
+void sig_handler(int signo)
+{
+       if (signo == SIGINT){
+                printf("\nReceived SIGINT, closing server\n");
+                write_server_log("Closed NDMP server\n");
+                exit(0);
+       }
+}
 
 struct comm_context* comm_context()
 {
@@ -71,14 +83,13 @@ int create_listener(int port) {
                 errExit("Error:bind");
 
         return retval;
-
 }
 
 struct client_endpoint accept_connection(int listener)
 {
         struct sockaddr_in client;
         socklen_t len;
-        int sockfd;
+        int sockfd, logfilelen, writebuflen;
         struct client_endpoint retval;
 
         retval.fd = -1;
@@ -92,7 +103,6 @@ struct client_endpoint accept_connection(int listener)
         fcntl(sockfd, F_SETFL, O_NONBLOCK);
         retval.client = client;
         retval.fd = sockfd;
-
         printf("Accepted new connection ..\n");
         return retval;
 }
@@ -140,12 +150,18 @@ void comm_listen(struct comm_context *ctx)
         struct client_endpoint *temp;
         int ready;
         int new_connections;
+        char message[32];
+        write_server_log("Started NDMP server");
 
         FD_ZERO(&read_socks);
 
         listener = create_listener(LISTEN_PORT);
+        write_server_log("Created listener");
+
         listen(listener, NUM_SESSIONS);
 
+        sprintf(message, "Listening on port %d", LISTEN_PORT );
+        write_server_log(message);
         printf("Listening on port %d....\n", LISTEN_PORT);
         /*
          * add listening socket to read_socks
@@ -156,25 +172,32 @@ void comm_listen(struct comm_context *ctx)
 
         /* Create Worker Threads */
         create_worker_threads(THREAD_POOL_SIZE);
+        write_server_log("Created worker threads");
+
         /* when the listener wakes up create a session */
+        signal(SIGINT, sig_handler);
 
         for (;;) {
                 printf("Wait on select \n");
+                write_server_log("Wait on select");
                 set_fd_flags(&read_socks, listener, ctx);
                 ready = select((ctx->maxfds) + 1, &read_socks, NULL, NULL,
                                 NULL );
-                printf("Woke up from  select \n");
+                printf("Woke up from select \n");
+                write_server_log("Woke up from select");
                 if (ready != -1) {
                         if (FD_ISSET(listener, &read_socks)) {
                                 new_connections = accept_all_connections(
                                         listener, &read_socks, ctx);
                                 printf("%d new connection(s) \n",
                                                 new_connections);
+                                write_server_log("Detected 1 new connection");
                                 } else {
                                 /*
                                  * Some client session is active
                                  */
                                 handle_client_requests(&read_socks, ctx);
+                                write_server_log("Received client request");
                                 }
                 }
 
@@ -209,7 +232,8 @@ int accept_all_connections(int listener, fd_set *read_socks,
                 if (endpoint.fd > ctx->maxfds) {
                         ctx->maxfds = endpoint.fd;
                 }
-
+                write_client_log(endpoint.client, "Client connection accepted");
+                write_server_log("Client connection accepted");
                 printf("Connection request from %s at %d\n",
                                 inet_ntoa(endpoint.client.sin_addr),
                                 ntohs(endpoint.client.sin_port));
@@ -268,11 +292,14 @@ void handle_a_client_request(int fd, struct comm_context *ctx)
                 remove_elem(ctx->sessions, &tmp, session_comparator);
                 ctx->terminate_session(fd);/* mark this session as terminated */
                 free(txn);
+                write_client_log(tmp.client_info.client, "Connection closed by client\n");
 
                 printf("Detected socket closure\n");
                 return;
         }
         enqueue(ctx->request_jobs, txn);
+        write_server_log("Created a new job on socket at server");
+
         printf("\tcreated a new job on %d [%d bytes]\n", fd,
                         txn->request.length);
 }

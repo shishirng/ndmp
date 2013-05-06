@@ -101,6 +101,8 @@ void ndmp_config_get_host_info(struct client_txn *txn,
         xdr_ndmp_header(&reply_stream, &reply_header);
         if (reply.error == NDMP_NO_ERR)  {
                 xdr_ndmp_config_get_host_info_reply(&reply_stream, &reply);
+                write_client_log(txn->client_session.client_info.client, "Sent HOST INFO to client");
+
         }
         else
                 txn->reply.length -= xdr_sizeof((xdrproc_t)
@@ -157,6 +159,8 @@ void ndmp_config_get_connection_type(struct client_txn *txn, struct ndmp_header 
                 txn->reply.length -= xdr_sizeof((xdrproc_t)
                                                 xdr_ndmp_config_get_connection_type_reply, 
                                                 &reply);
+        write_client_log(txn->client_session.client_info.client, "Sent CONNECTION TYPES to client");
+
 }
 
 void ndmp_config_get_auth_attr(struct client_txn *txn, struct ndmp_header header, XDR* request_stream) 
@@ -210,6 +214,8 @@ void ndmp_config_get_auth_attr(struct client_txn *txn, struct ndmp_header header
         xdr_ndmp_header(&reply_stream, &reply_header);
         if (reply.error == NDMP_NO_ERR)  {
                 xdr_ndmp_config_get_auth_attr_reply(&reply_stream, &reply);
+                write_client_log(txn->client_session.client_info.client, "Sent authentication attributes to client");
+
         }
         else
                 txn->reply.length -= xdr_sizeof((xdrproc_t)
@@ -288,7 +294,8 @@ void ndmp_config_get_butype_info(struct client_txn *txn,
         
         xdr_ndmp_header(&reply_stream, &reply_header);
         xdr_ndmp_config_get_butype_info_reply(&reply_stream, &reply);
-        
+        write_client_log(txn->client_session.client_info.client, "Sent BACKUP TYPE INFO to client");
+
         free(bu_type_info); 
 
         
@@ -394,6 +401,7 @@ void ndmp_config_get_fs_info(struct client_txn *txn, struct ndmp_header header, 
                 txn->reply.length -= xdr_sizeof((xdrproc_t)
                                                 xdr_ndmp_config_get_fs_info_reply, 
                                                 &reply);
+        write_client_log(txn->client_session.client_info.client, "Sent FILE SYSTEM INFO to client");
 
         free(fs_info->fs_logical_device);
         free(fs_info->fs_physical_device);
@@ -468,6 +476,8 @@ void ndmp_config_get_tape_info(struct client_txn *txn, struct ndmp_header header
         xdr_ndmp_header(&reply_stream, &reply_header);
         if (reply.error == NDMP_NO_ERR) {
                 xdr_ndmp_config_get_tape_info_reply(&reply_stream, &reply);
+                write_client_log(txn->client_session.client_info.client, "Sent TAPE INFO to client");
+
         }
         else
                 txn->reply.length -= xdr_sizeof((xdrproc_t) xdr_ndmp_config_get_tape_info_reply,
@@ -528,6 +538,8 @@ void ndmp_config_get_scsi_info(struct client_txn *txn,
         xdr_ndmp_header(&reply_stream, &reply_header);
         if (reply.error == NDMP_NO_ERR)  {
                 xdr_ndmp_config_get_scsi_info_reply(&reply_stream, &reply);
+                write_client_log(txn->client_session.client_info.client, "Sent SCSI INFO to client");
+
         }
         else
                 txn->reply.length -= xdr_sizeof((xdrproc_t)
@@ -580,6 +592,8 @@ void ndmp_config_get_server_info(struct client_txn *txn, struct ndmp_header head
         xdr_ndmp_header(&reply_stream, &reply_header);
         if (reply.error == NDMP_NO_ERR)  {
                 xdr_ndmp_config_get_server_info_reply(&reply_stream, &reply);
+                write_client_log(txn->client_session.client_info.client, "Sent server info to client");
+
         }
         else
                 txn->reply.length -= xdr_sizeof((xdrproc_t)

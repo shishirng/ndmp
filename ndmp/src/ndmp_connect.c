@@ -33,7 +33,6 @@
 
 void ndmp_connect_open(struct client_txn *txn, struct ndmp_header header, XDR* request_stream) 
 {
-
         /* NDMP_CONNECT_OPEN
          *
          * struct ndmp_connect_open_request
@@ -47,7 +46,7 @@ void ndmp_connect_open(struct client_txn *txn, struct ndmp_header header, XDR* r
          * };
          *
          */
-
+        
         struct ndmp_connect_open_request request;
         struct ndmp_header reply_header;
         struct ndmp_connect_open_reply reply;
@@ -92,8 +91,9 @@ void ndmp_connect_open(struct client_txn *txn, struct ndmp_header header, XDR* r
         else
                 txn->reply.length -= xdr_sizeof((xdrproc_t) 
                                         xdr_ndmp_connect_open_reply, &reply);
+        write_client_log(txn->client_session.client_info.client, "Sent CONNECT_OPEN to client");
+
         exit_critical_section(session_info->s_lock);
-       
 }
 
 
@@ -101,7 +101,6 @@ void ndmp_connect_close(struct client_txn *txn,
                         struct ndmp_header header,  
                         XDR* request_stream)
 {
- 
         /* NDMP_CONNECT_CLOSE */
         /* no request arguments */
         /* no reply message */
@@ -121,8 +120,7 @@ void ndmp_connect_close(struct client_txn *txn,
         session_info->mover_state = HALTED;
         txn->reply.length = 0; // No reply to be sent
 
+        write_client_log(txn->client_session.client_info.client, "Sent CONNECT_CLOSE to client");
 
         exit_critical_section(session_info->s_lock);
-
-       
 }

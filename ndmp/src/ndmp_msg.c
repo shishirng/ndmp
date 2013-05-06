@@ -41,6 +41,8 @@ void xdr_decode_encode(struct client_txn *txn)
         char *buf, mesg_len[4];
         int len;
         struct comm_context *ctx = comm_context();
+        write_client_log(txn->client_session.client_info.client, "Received request from client");
+
         if (txn->request.is_tcp_connect == 1) {
                 header.message = 0xf001;
         }
@@ -52,14 +54,17 @@ void xdr_decode_encode(struct client_txn *txn)
                  */
 
                 xdr_ndmp_header(&request_stream, &header);
+                write_client_log(txn->client_session.client_info.client, "Decoded NDMP header from client request");
+
         }
         /*
          * Add job to session's job queue
          */
 
         add_job_to_session(txn);
+        write_client_log(txn->client_session.client_info.client, "Dispatched client request to appropriate message handler");
         ndmp_dispatch(header.message)(txn, header, &request_stream);
-        
+
         if (cleanup_session(txn) == 1 || txn->reply.length == 0) {
                 free(txn); /* client terminated. Don't send response */
         }
@@ -83,7 +88,6 @@ void xdr_decode_encode(struct client_txn *txn)
                 free(buf);
         }
 
-     
 }
 
 ndmp_message_handler ndmp_dispatch(int message) {
@@ -150,7 +154,6 @@ void ndmp_error_message(struct client_txn *txn,
 
 void ndmp_accept_notify(struct client_txn* txn, struct ndmp_header header, XDR* request_stream) 
 {
-
         struct ndmp_notify_connected_request reply;
         struct ndmp_header reply_header;
         XDR reply_stream;
@@ -179,7 +182,8 @@ void ndmp_accept_notify(struct client_txn* txn, struct ndmp_header header, XDR* 
 
         xdr_ndmp_header(&reply_stream, &reply_header);
         xdr_ndmp_notify_connected_request(&reply_stream, &reply);
-        
+        write_client_log(txn->client_session.client_info.client, "Sent CONNECT_NOTIFY to client");
+
 }
 
 

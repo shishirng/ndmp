@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
-#include "queue.h"
+#include <queue.h>
 #include <locks.h>
 
 static struct lock *num_lock;

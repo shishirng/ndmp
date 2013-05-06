@@ -22,7 +22,8 @@ OBJS = $(ROOT)/ndmp/src/ndmp_connect.o \
 	$(ROOT)/comm/src/worker.o \
 	$(ROOT)/utils/src/locks.o \
 	$(ROOT)/utils/src/hexdump.o \
-	$(ROOT)/utils/src/queue.o
+	$(ROOT)/utils/src/queue.o \
+	$(ROOT)/utils/src/logs.o
 
 
 testndmp: 
