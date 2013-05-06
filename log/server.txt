@@ -1,0 +1,214 @@
+[2013-04-29 12:35:19.837563] [Server]: 
+Started NDMP server
+[2013-04-29 12:35:19.837872] [Server]: Created listener
+[2013-04-29 12:35:19.837913] [Server]: Listening on port 10000....
+
+[2013-04-29 12:35:19.838109] [Server]: Created worker threads
+[2013-04-29 12:35:19.838154] [Server]: Wait on select
+[2013-04-29 12:35:23.865369] [Server]: Woke up from select
+[2013-04-29 12:35:23.865786] [Server]: Client connection accepted
+[2013-04-29 12:35:23.865822] [Server]: 1 new connection
+[2013-04-29 12:35:23.865843] [Server]: Wait on select
+[2013-04-29 12:35:27.433553] [Server]: Woke up from select
+[2013-04-29 12:35:27.433693] [Server]: Created a new job on socket at server
+[2013-04-29 12:35:27.433734] [Server]: Received client request
+[2013-04-29 12:35:27.433762] [Server]: Wait on select
+[2013-04-29 12:35:33.045078] [Server]: Woke up from select
+[2013-04-29 12:35:33.045159] [Server]: Created a new job on socket at server
+[2013-04-29 12:35:33.045221] [Server]: Received client request
+[2013-04-29 12:35:33.045243] [Server]: Wait on select
+[2013-04-29 12:35:39.361810] [Server]: Woke up from select
+[2013-04-29 12:35:39.361907] [Server]: Created a new job on socket at server
+[2013-04-29 12:35:39.361947] [Server]: Received client request
+[2013-04-29 12:35:39.361967] [Server]: Wait on select
+[2013-04-29 12:35:43.199213] [Server]: Woke up from select
+[2013-04-29 12:35:43.199291] [Server]: Created a new job on socket at server
+[2013-04-29 12:35:43.199317] [Server]: Received client request
+[2013-04-29 12:35:43.199337] [Server]: Wait on select
+[2013-04-29 12:35:44.472425] [Server]: Woke up from select
+[2013-04-29 12:35:44.472602] [Server]: Received client request
+[2013-04-29 12:35:44.472621] [Server]: Wait on select
+[2013-04-29 12:41:34.911698] [Server]: Started NDMP server
+[2013-04-29 12:41:34.911982] [Server]: Created listener
+[2013-04-29 12:41:34.912100] [Server]: Listening on port 10000
+[2013-04-29 12:41:34.912240] [Server]: Created worker threads
+[2013-04-29 12:41:34.912280] [Server]: Wait on select
+[2013-04-29 12:41:43.039787] [Server]: Woke up from select
+[2013-04-29 12:41:43.039907] [Server]: Client connection accepted
+[2013-04-29 12:41:43.039940] [Server]: Detected 1 new connection
+[2013-04-29 12:41:43.039962] [Server]: Wait on select
+[2013-04-29 12:41:49.899810] [Server]: Woke up from select
+[2013-04-29 12:41:49.899892] [Server]: Created a new job on socket at server
+[2013-04-29 12:41:49.899919] [Server]: Received client request
+[2013-04-29 12:41:49.899937] [Server]: Wait on select
+[2013-04-29 12:41:52.818814] [Server]: Woke up from select
+[2013-04-29 12:41:52.818882] [Server]: Created a new job on socket at server
+[2013-04-29 12:41:52.818948] [Server]: Received client request
+[2013-04-29 12:41:52.818971] [Server]: Wait on select
+[2013-04-29 12:41:53.467259] [Server]: Woke up from select
+[2013-04-29 12:41:53.467437] [Server]: Received client request
+[2013-04-29 12:41:53.467455] [Server]: Wait on select
+[2013-04-29 12:43:29.307174] [Server]: Started NDMP server
+[2013-04-29 12:43:29.307473] [Server]: Created listener
+[2013-04-29 12:43:29.307518] [Server]: Listening on port 10000
+[2013-04-29 12:43:29.307649] [Server]: Created worker threads
+[2013-04-29 12:43:29.307688] [Server]: Wait on select
+[2013-04-29 12:43:39.324824] [Server]: Woke up from select
+[2013-04-29 12:43:39.325256] [Server]: Client connection accepted
+[2013-04-29 12:43:39.325288] [Server]: Detected 1 new connection
+[2013-04-29 12:43:39.325307] [Server]: Wait on select
+[2013-04-29 12:43:42.451037] [Server]: Woke up from select
+[2013-04-29 12:43:42.451135] [Server]: Client connection accepted
+[2013-04-29 12:43:42.451158] [Server]: Detected 1 new connection
+[2013-04-29 12:43:42.451177] [Server]: Wait on select
+[2013-04-29 12:43:48.029020] [Server]: Woke up from select
+[2013-04-29 12:43:48.029166] [Server]: Created a new job on socket at server
+[2013-04-29 12:43:48.029496] [Server]: Received client request
+[2013-04-29 12:43:48.029539] [Server]: Wait on select
+[2013-04-29 12:43:53.194777] [Server]: Woke up from select
+[2013-04-29 12:43:53.194858] [Server]: Created a new job on socket at server
+[2013-04-29 12:43:53.194893] [Server]: Received client request
+[2013-04-29 12:43:53.194924] [Server]: Wait on select
+[2013-04-29 12:44:09.134847] [Server]: Woke up from select
+[2013-04-29 12:44:09.135028] [Server]: Received client request
+[2013-04-29 12:44:09.135049] [Server]: Wait on select
+[2013-04-29 12:44:10.773558] [Server]: Woke up from select
+[2013-04-29 12:44:10.773702] [Server]: Received client request
+[2013-04-29 12:44:10.773722] [Server]: Wait on select
+[2013-04-29 12:45:47.025907] [Server]: Woke up from select
+[2013-04-29 12:45:47.026013] [Server]: Client connection accepted
+[2013-04-29 12:45:47.026047] [Server]: Detected 1 new connection
+[2013-04-29 12:45:47.026108] [Server]: Wait on select
+[2013-04-29 12:45:50.059553] [Server]: Woke up from select
+[2013-04-29 12:45:50.059679] [Server]: Client connection accepted
+[2013-04-29 12:45:50.059706] [Server]: Detected 1 new connection
+[2013-04-29 12:45:50.059734] [Server]: Wait on select
+[2013-04-29 12:45:56.928060] [Server]: Woke up from select
+[2013-04-29 12:45:56.928219] [Server]: Received client request
+[2013-04-29 12:45:56.928238] [Server]: Wait on select
+[2013-04-29 12:45:58.984637] [Server]: Woke up from select
+[2013-04-29 12:45:58.984811] [Server]: Received client request
+[2013-04-29 12:45:58.984830] [Server]: Wait on select
+[2013-04-29 13:00:57.560453] [Server]: Started NDMP server
+[2013-04-29 13:00:57.560749] [Server]: Created listener
+[2013-04-29 13:00:57.560789] [Server]: Listening on port 10000
+[2013-04-29 13:00:57.560919] [Server]: Created worker threads
+[2013-04-29 13:00:57.560962] [Server]: Wait on select
+[2013-04-29 13:01:02.625090] [Server]: Woke up from select
+[2013-04-29 13:01:02.625501] [Server]: Client connection accepted
+[2013-04-29 13:01:02.625542] [Server]: Detected 1 new connection
+[2013-04-29 13:01:02.625562] [Server]: Wait on select
+[2013-04-29 13:01:03.943724] [Server]: Woke up from select
+[2013-04-29 13:01:03.943900] [Server]: Received client request
+[2013-04-29 13:01:03.943912] [Server]: Wait on select
+[2013-04-29 13:01:06.498796] [Server]: Closing server
+
+[2013-04-29 13:11:13.054916] [Server]: Started NDMP server
+[2013-04-29 13:11:13.055243] [Server]: Created listener
+[2013-04-29 13:11:13.055285] [Server]: Listening on port 10000
+[2013-04-29 13:11:13.055416] [Server]: Created worker threads
+[2013-04-29 13:11:13.055458] [Server]: Wait on select
+[2013-04-29 13:11:14.128071] [Server]: Closing server
+
+[2013-04-29 13:11:14.820811] [Server]: Started NDMP server
+[2013-04-29 13:11:14.821120] [Server]: Created listener
+[2013-04-29 13:11:14.821171] [Server]: Listening on port 10000
+[2013-04-29 13:11:14.821301] [Server]: Created worker threads
+[2013-04-29 13:11:14.821342] [Server]: Wait on select
+[2013-04-29 13:11:15.229376] [Server]: Closing server
+
+[2013-04-29 13:11:15.848142] [Server]: Started NDMP server
+[2013-04-29 13:11:15.848439] [Server]: Created listener
+[2013-04-29 13:11:15.848481] [Server]: Listening on port 10000
+[2013-04-29 13:11:15.848613] [Server]: Created worker threads
+[2013-04-29 13:11:15.848655] [Server]: Wait on select
+[2013-04-29 13:11:16.196425] [Server]: Closing server
+
+[2013-04-29 15:16:49.126419] [Server]: Started NDMP server
+[2013-04-29 15:16:49.136384] [Server]: Created listener
+[2013-04-29 15:16:49.136430] [Server]: Listening on port 10000
+[2013-04-29 15:16:49.136521] [Server]: Created worker threads
+[2013-04-29 15:16:49.136544] [Server]: Wait on select
+[2013-04-29 15:16:56.291276] [Server]: Woke up from select
+[2013-04-29 15:16:56.291390] [Server]: Client connection accepted
+[2013-04-29 15:16:56.291418] [Server]: Detected 1 new connection
+[2013-04-29 15:16:56.291436] [Server]: Wait on select
+[2013-04-29 15:17:02.518031] [Server]: Woke up from select
+[2013-04-29 15:17:02.518141] [Server]: Client connection accepted
+[2013-04-29 15:17:02.518168] [Server]: Detected 1 new connection
+[2013-04-29 15:17:02.518189] [Server]: Wait on select
+[2013-04-29 15:17:09.014609] [Server]: Woke up from select
+[2013-04-29 15:17:09.014710] [Server]: Created a new job on socket at server
+[2013-04-29 15:17:09.014740] [Server]: Received client request
+[2013-04-29 15:17:09.014779] [Server]: Wait on select
+[2013-04-29 15:17:26.168205] [Server]: Woke up from select
+[2013-04-29 15:17:26.168295] [Server]: Created a new job on socket at server
+[2013-04-29 15:17:26.168326] [Server]: Received client request
+[2013-04-29 15:17:26.168346] [Server]: Wait on select
+[2013-04-29 15:17:33.141585] [Server]: Woke up from select
+[2013-04-29 15:17:33.141677] [Server]: Created a new job on socket at server
+[2013-04-29 15:17:33.141751] [Server]: Received client request
+[2013-04-29 15:17:33.141774] [Server]: Wait on select
+[2013-04-29 15:17:41.467108] [Server]: Woke up from select
+[2013-04-29 15:17:41.467205] [Server]: Created a new job on socket at server
+[2013-04-29 15:17:41.467283] [Server]: Received client request
+[2013-04-29 15:17:41.467305] [Server]: Wait on select
+[2013-04-29 15:17:48.074524] [Server]: Woke up from select
+[2013-04-29 15:17:48.074691] [Server]: Received client request
+[2013-04-29 15:17:48.074709] [Server]: Wait on select
+[2013-04-29 15:17:49.985726] [Server]: Woke up from select
+[2013-04-29 15:17:49.985889] [Server]: Received client request
+[2013-04-29 15:17:49.985907] [Server]: Wait on select
+[2013-04-29 15:17:52.125170] [Server]: Closing NDMP server
+
+[2013-04-29 15:43:53.826916] [Server]: Started NDMP server
+[2013-04-29 15:43:53.827271] [Server]: Created listener
+[2013-04-29 15:43:53.827311] [Server]: Listening on port 10000
+[2013-04-29 15:43:53.827445] [Server]: Created worker threads
+[2013-04-29 15:43:53.827488] [Server]: Wait on select
+[2013-04-29 15:44:12.106268] [Server]: Closing NDMP server
+
+[2013-04-30 12:12:41.379353] [Server]: Started NDMP server
+[2013-04-30 12:12:41.379655] [Server]: Created listener
+[2013-04-30 12:12:41.379700] [Server]: Listening on port 10000
+[2013-04-30 12:12:41.379830] [Server]: Created worker threads
+[2013-04-30 12:12:41.379873] [Server]: Wait on select
+[2013-04-30 12:12:57.652339] [Server]: Woke up from select
+[2013-04-30 12:12:57.652810] [Server]: Client connection accepted
+[2013-04-30 12:12:57.652842] [Server]: Detected 1 new connection
+[2013-04-30 12:12:57.652862] [Server]: Wait on select
+[2013-04-30 12:13:14.270013] [Server]: Woke up from select
+[2013-04-30 12:13:14.270096] [Server]: Created a new job on socket at server
+[2013-04-30 12:13:14.270165] [Server]: Received client request
+[2013-04-30 12:13:14.270187] [Server]: Wait on select
+[2013-04-30 12:17:10.791032] [Server]: Woke up from select
+[2013-04-30 12:17:10.791132] [Server]: Created a new job on socket at server
+[2013-04-30 12:17:10.791154] [Server]: Received client request
+[2013-04-30 12:17:10.791174] [Server]: Wait on select
+[2013-04-30 12:17:26.725609] [Server]: Woke up from select
+[2013-04-30 12:17:26.725698] [Server]: Created a new job on socket at server
+[2013-04-30 12:17:26.725790] [Server]: Received client request
+[2013-04-30 12:17:26.725836] [Server]: Wait on select
+[2013-04-30 12:17:30.150729] [Server]: Woke up from select
+[2013-04-30 12:17:30.150819] [Server]: Created a new job on socket at server
+[2013-04-30 12:17:30.150857] [Server]: Received client request
+[2013-04-30 12:17:30.150889] [Server]: Wait on select
+[2013-04-30 12:17:33.743942] [Server]: Woke up from select
+[2013-04-30 12:17:33.744084] [Server]: Received client request
+[2013-04-30 12:17:33.744103] [Server]: Wait on select
+[2013-04-30 12:17:45.936115] [Server]: Closing NDMP server
+
+[2013-04-30 14:00:11.153999] [Server]: Started NDMP server
+[2013-04-30 14:00:11.154302] [Server]: Created listener
+[2013-04-30 14:00:11.154348] [Server]: Listening on port 10000
+[2013-04-30 14:00:11.154501] [Server]: Created worker threads
+[2013-04-30 14:00:11.154551] [Server]: Wait on select
+[2013-04-30 14:00:29.279012] [Server]: Woke up from select
+[2013-04-30 14:00:29.279184] [Server]: Client connection accepted
+[2013-04-30 14:00:29.279249] [Server]: Detected 1 new connection
+[2013-04-30 14:00:29.279294] [Server]: Wait on select
+[2013-04-30 14:00:35.699300] [Server]: Woke up from select
+[2013-04-30 14:00:35.699500] [Server]: Received client request
+[2013-04-30 14:00:35.699523] [Server]: Wait on select
+[2013-04-30 14:00:37.263934] [Server]: Closed NDMP server
+

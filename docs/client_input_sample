@@ -1,0 +1,21 @@
+connect_open
+
+data_connect local
+add_env FILESYSTEM /mnt/bu_point/gl_vol_1
+add_env USER root
+data_start_backup dump
+
+add_nlist /test /mnt/recover_bu/gl_vol_1 fh_info node new_name other_name
+data_start_recover dump
+
+data_stop
+
+
+config_get_host_info
+config_get_connection_type
+config_get_auth_attr none|text|md5
+config_get_butype_info
+config_get_fs_info
+config_get_tape_info
+config_get_scsi_info
+config_get_server_info

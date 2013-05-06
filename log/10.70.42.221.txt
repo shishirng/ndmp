@@ -1,0 +1,22 @@
+[2013-04-30 12:12:57.652766] [Client (10.70.42.221:58989)]: Client connection accepted
+[2013-04-30 12:12:57.652852] [Client (10.70.42.221:58989)]: Received request from client
+[2013-04-30 12:12:57.652921] [Client (10.70.42.221:58989)]: Dispatched client request to appropriate message handler
+[2013-04-30 12:12:57.652960] [Client (10.70.42.221:58989)]: Sent CONNECT_NOTIFY to client
+[2013-04-30 12:13:14.270186] [Client (10.70.42.221:58989)]: Received request from client
+[2013-04-30 12:13:14.270242] [Client (10.70.42.221:58989)]: Decoded NDMP header from client request
+[2013-04-30 12:13:14.270266] [Client (10.70.42.221:58989)]: Dispatched client request to appropriate message handler
+[2013-04-30 12:13:14.270298] [Client (10.70.42.221:58989)]: Sent HOST INFO to client
+[2013-04-30 12:17:10.791158] [Client (10.70.42.221:58989)]: Received request from client
+[2013-04-30 12:17:10.791191] [Client (10.70.42.221:58989)]: Decoded NDMP header from client request
+[2013-04-30 12:17:10.791212] [Client (10.70.42.221:58989)]: Dispatched client request to appropriate message handler
+[2013-04-30 12:17:10.791243] [Client (10.70.42.221:58989)]: Sent server info to client
+[2013-04-30 12:17:26.725888] [Client (10.70.42.221:58989)]: Received request from client
+[2013-04-30 12:17:26.725915] [Client (10.70.42.221:58989)]: Decoded NDMP header from client request
+[2013-04-30 12:17:26.725935] [Client (10.70.42.221:58989)]: Dispatched client request to appropriate message handler
+[2013-04-30 12:17:26.725955] [Client (10.70.42.221:58989)]: Sent CONNECT_OPEN to client
+[2013-04-30 12:17:30.150853] [Client (10.70.42.221:58989)]: Received request from client
+[2013-04-30 12:17:30.150889] [Client (10.70.42.221:58989)]: Decoded NDMP header from client request
+[2013-04-30 12:17:30.150923] [Client (10.70.42.221:58989)]: Dispatched client request to appropriate message handler
+[2013-04-30 12:17:30.150939] [Client (10.70.42.221:58989)]: Sent CONNECT_CLOSE to client
+[2013-04-30 12:17:33.744055] [Client (10.70.42.221:58989)]: Connection closed by client
+
