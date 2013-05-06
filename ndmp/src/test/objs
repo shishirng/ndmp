@@ -1,0 +1,9 @@
+./ndmp/src/ndmp_connect.o
+./ndmp/src/ndmp_msg.o
+./ndmp/src/ndmp_config.o
+./ndmp/src/ndmp_xdr.o
+./comm/src/comm.o
+./comm/src/worker.o
+./utils/src/locks.o
+./utils/src/hexdump.o
+./utils/src/queue.o
