@@ -1,0 +1,16 @@
+[2013-04-29 12:43:39.325212] [Client (127.0.0.1:35131)]: Client connection accepted
+[2013-04-29 12:43:39.325305] [Client (127.0.0.1:35131)]: Received request from client
+[2013-04-29 12:43:39.325392] [Client (127.0.0.1:35131)]: Dispatched client request to appropriate message handler
+[2013-04-29 12:43:39.325433] [Client (127.0.0.1:35131)]: Sent CONNECT_NOTIFY to client
+[2013-04-29 12:43:48.029260] [Client (127.0.0.1:35131)]: Received request from client
+[2013-04-29 12:43:48.029473] [Client (127.0.0.1:35131)]: Decoded NDMP header from client request
+[2013-04-29 12:43:48.029510] [Client (127.0.0.1:35131)]: Dispatched client request to appropriate message handler
+[2013-04-29 12:43:48.029552] [Client (127.0.0.1:35131)]: Sent CONNECT_OPEN to client
+[2013-04-29 12:44:09.134985] [Client (127.0.0.1:35131)]: Connection closed by client
+
+[2013-04-30 14:00:29.279151] [Client (127.0.0.1:40763)]: Client connection accepted
+[2013-04-30 14:00:29.279250] [Client (127.0.0.1:40763)]: Received request from client
+[2013-04-30 14:00:29.279340] [Client (127.0.0.1:40763)]: Dispatched client request to appropriate message handler
+[2013-04-30 14:00:29.279380] [Client (127.0.0.1:40763)]: Sent CONNECT_NOTIFY to client
+[2013-04-30 14:00:35.699469] [Client (127.0.0.1:40763)]: Connection closed by client
+
