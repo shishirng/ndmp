@@ -245,6 +245,8 @@ void ndmp_data_start_backup(struct client_txn *txn,
          * themselves have a maximum length of 64 characters.
          */
 
+        write_client_log(txn->client_session.client_info.client, "Backup operation commencing");
+
         request.bu_type = (char*) malloc(8*sizeof(char));
         request.env.env_len = 8;
         request.env.env_val = (ndmp_pval*)malloc(8*sizeof(ndmp_pval) );
@@ -264,14 +266,19 @@ void ndmp_data_start_backup(struct client_txn *txn,
         // checking state
         if(session_info -> data_state != NDMP_DATA_STATE_CONNECTED){
                 reply.error = NDMP_ILLEGAL_STATE_ERR;
+                write_client_log(txn->client_session.client_info.client, "Illegal state");
+
         }
         else {
              //changing state
                 session_info->data_state = NDMP_DATA_STATE_ACTIVE;
+                write_client_log(txn->client_session.client_info.client, "Changed state to active");
         }
 
         char full_ip[30]="";
         strcpy(full_ip,inet_ntoa(txn->client_session.client_info.client.sin_addr));
+
+        write_client_log(txn->client_session.client_info.client, "Obtained client IP");
 
 #ifdef DEBUG
         printf("Butype : %s \n",request.bu_type );
@@ -287,6 +294,8 @@ void ndmp_data_start_backup(struct client_txn *txn,
                 strcpy(data_env->env_val[i].name,request.env.env_val[i].name);
                 strcpy(data_env->env_val[i].value,request.env.env_val[i].value);
         }
+
+        write_client_log(txn->client_session.client_info.client, "Obtained all environment variables");
 
         char* name_buf;
         char* val_buf;
@@ -320,12 +329,15 @@ void ndmp_data_start_backup(struct client_txn *txn,
         printf("enter the volume name : ");
         scanf("%s",vol_name );
 
+        write_client_log(txn->client_session.client_info.client, "Obtained volume name");
         char *mount_point;
         mount_point = (char*) malloc(16 * sizeof(char));
         strcpy(mount_point,"/mnt/backedup2/");
 
         mount_point = (char*) realloc(mount_point,strlen(mount_point) + strlen(vol_name) + 3);
         strcat(mount_point,vol_name);
+
+        write_client_log(txn->client_session.client_info.client, "Obtained mount point");
 
         char * dir_inst_1;
         dir_inst_1 = (char*) malloc (11 * sizeof(char));
@@ -335,6 +347,7 @@ void ndmp_data_start_backup(struct client_txn *txn,
 
         printf("creating directory for volume mount $ %s ",dir_inst_1);
         system(dir_inst_1);
+        write_client_log(txn->client_session.client_info.client, "Creating directory for volume mount");
 
         // mount_point does not end with '/'
         char *mount_instr;
@@ -354,6 +367,8 @@ void ndmp_data_start_backup(struct client_txn *txn,
         strcat(mount_instr," ");
         strcat(mount_instr,mount_point);
 
+        write_client_log(txn->client_session.client_info.client, "Created mount instruction");
+
 #ifdef DEBUG
         printf("\nprinting mount instr $ %s \n",mount_instr);
 #endif
@@ -371,6 +386,8 @@ void ndmp_data_start_backup(struct client_txn *txn,
 
                 mount_done = TRUE;
         }
+
+        write_client_log(txn->client_session.client_info.client, "Mount successful");
 
         char* backup_location;
 
@@ -393,6 +410,8 @@ void ndmp_data_start_backup(struct client_txn *txn,
                 printf("mount point directory creation failed or already exists \n");
         }
 
+        write_client_log(txn->client_session.client_info.client, "Created mount point directory");
+
         char *rsync_instr;
         rsync_instr = (char*) malloc ( 12 * sizeof(char ));
         strcpy(rsync_instr,"rsync -av ");
@@ -405,6 +424,9 @@ void ndmp_data_start_backup(struct client_txn *txn,
         strcat(rsync_instr, client_path);
         strcat(rsync_instr,"/ ");
         strcat(rsync_instr,backup_location);
+
+        write_client_log(txn->client_session.client_info.client, "Created rsync instruction");
+
 
 #ifdef DEBUG
          printf("printing rsync instr $ %s \n",rsync_instr);
@@ -421,6 +443,9 @@ void ndmp_data_start_backup(struct client_txn *txn,
                 session_info->data_state = NDMP_DATA_STATE_HALTED;
                 goto SEND ;
         }
+
+        write_client_log(txn->client_session.client_info.client, "Data transfer complete");
+
 
 SEND:   set_header(header, &reply_header, reply.error);
         txn->reply.length = xdr_sizeof((xdrproc_t) xdr_ndmp_header, &reply_header);
@@ -481,6 +506,8 @@ void ndmp_data_start_recover(struct client_txn *txn,
                  * themselves have a maximum length of 64 characters.
                  */
 
+                write_client_log(txn->client_session.client_info.client, "Recovery process commencing");
+
                 request.bu_type = (char*) malloc(8*sizeof(char));
                 request.env.env_len = 8;
                 request.env.env_val = (ndmp_pval*)malloc(8*sizeof(ndmp_pval) );
@@ -506,14 +533,20 @@ void ndmp_data_start_recover(struct client_txn *txn,
 
                 if(session_info -> data_state != NDMP_DATA_STATE_CONNECTED){
                         reply.error = NDMP_ILLEGAL_STATE_ERR;
+                        write_client_log(txn->client_session.client_info.client, "Illegal state");
+
                 }
                 else {
                         //changing state
                         session_info->data_state = NDMP_DATA_STATE_ACTIVE;
+                        write_client_log(txn->client_session.client_info.client, "Changed state to active");
+
                 }
 
                 char full_ip[20]="";
                 strcpy(full_ip,inet_ntoa(txn->client_session.client_info.client.sin_addr));
+
+                write_client_log(txn->client_session.client_info.client, "Obtained full IP");
 
                 ndmp_pval* env_val = request.env.env_val;
                 u_long env_len = request.env.env_len;
@@ -548,10 +581,14 @@ void ndmp_data_start_recover(struct client_txn *txn,
                 mount_point = (char*) malloc(16*sizeof(char) );
                 strcpy(mount_point,"/mnt/backedup2/");
 
+
                 // to be resolved later by making client's backup info and volume info as key value pair
                 printf("give the volume name used for backup : ");
                 char vol_name[20];
                 scanf("%s",vol_name);
+
+                write_client_log(txn->client_session.client_info.client, "Obtained volume name");
+
                  mount_point = (char*) realloc(mount_point,strlen(mount_point) + strlen(vol_name) + strlen(full_ip) + \
                                  strlen(client_path ) + strlen(request.nlist.nlist_val[0].original_path ) + 2);
                 strcat(mount_point,vol_name);
@@ -560,6 +597,8 @@ void ndmp_data_start_recover(struct client_txn *txn,
                 strcat(mount_point,client_path);
                 // assumes the the orignal path always starts with "/"
                 strcat(mount_point,request.nlist.nlist_val[0].original_path);
+
+                write_client_log(txn->client_session.client_info.client, "Created mount point");
 
                 char *rsync_instr;
                 rsync_instr = (char*) malloc( 13 * sizeof(char));
@@ -574,11 +613,13 @@ void ndmp_data_start_recover(struct client_txn *txn,
                 strcat(rsync_instr,full_ip);
                 strcat(rsync_instr,":");
                 strcat(rsync_instr, request.nlist.nlist_val[0].destination_dir);
+
+                write_client_log(txn->client_session.client_info.client, "Created rsync instruction");
+
 #ifdef DEBUG
                 printf("printing rsync instr $ %s \n",rsync_instr);
 #endif
                 int ret_rsync_instr = system(rsync_instr);
-
 
                 if( ret_rsync_instr != 0){
 
@@ -589,7 +630,7 @@ void ndmp_data_start_recover(struct client_txn *txn,
                         goto SEND ;
                 }
 
-
+                write_client_log(txn->client_session.client_info.client, "Recovery data transfer successful");
 
          SEND : set_header(header, &reply_header, reply.error);
                 txn->reply.length = xdr_sizeof((xdrproc_t) xdr_ndmp_header, &reply_header);
